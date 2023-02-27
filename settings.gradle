@@ -1,0 +1,12 @@
+rootProject.name = 'qdroid'
+
+include(':amoeba_core')
+project(':amoeba_core').setProjectDir( new File(settingsDir, '../Amoeba'))
+//project() {
+//    name ':amoeba_core'
+//    projectDir new File(settingsDir, '../Amoeba')
+//    dependencies {
+//        compileOnly(project(':amoeba_core'))
+//    }
+//}
+
