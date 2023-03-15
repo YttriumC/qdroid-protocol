@@ -1,14 +1,19 @@
 package cf.vbnm.amoeba.qdroid.cq.events.enums
 
+import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
 /**
  * CQ Code对应的type
  * */
 @JsonDeserialize(using = MessagePartialType.Deserializer::class)
+@JsonSerialize(using = MessagePartialType.Serializer::class)
 enum class MessagePartialType(val type: String, val desc: String) {
     TEXT("text", "文字消息"),
     FACE("face", "QQ 表情"),
@@ -47,5 +52,12 @@ enum class MessagePartialType(val type: String, val desc: String) {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): MessagePartialType {
             return parseType(p.text)
         }
+    }
+
+    class Serializer : JsonSerializer<MessagePartialType>() {
+        override fun serialize(value: MessagePartialType, gen: JsonGenerator, serializers: SerializerProvider?) {
+            gen.writeString(value.type)
+        }
+
     }
 }

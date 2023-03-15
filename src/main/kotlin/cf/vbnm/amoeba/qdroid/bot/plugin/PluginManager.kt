@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component
 private val log = Slf4kt.getLogger(PluginManager::class.java)
 
 @Component
-class PluginManager(private val plugins: MutableList<Plugin<*>>) {
+class PluginManager(
+    private val plugins: MutableList<BasePlugin<*>>,
+    private val pluginMessageFilter: PluginMessageFilter
+) {
     init {
         plugins.sortBy { it ->
             AnnotationUtils.getAnnotation(it.javaClass, PluginTarget::class.java)?.let {
@@ -19,16 +22,27 @@ class PluginManager(private val plugins: MutableList<Plugin<*>>) {
         }
     }
 
+
     fun handleEvent(event: BasePostEvent, bot: QBot) {
+        if (event.isMessage()) {
+            if (pluginMessageFilter.consumeMessage(event.toMessage(), bot)) {
+                return
+            }
+        }
         try {
             plugins.forEach { plugin ->
-                if (plugin.isTargetEvent(event)) {
-                    plugin::class.members.forEach {
-                        if (it.name == "apply") {
-                            if (it.call(bot, event) == true) {
+                if (plugin.getTypeParameterClass().isInstance(event)) {
+                    plugin::class.members.filter { it.name == "handleEvent" }.forEach { kCallable ->
+                        try {
+                            if (kCallable.call(plugin, bot, event) == true) {
                                 return@handleEvent
                             }
+                        } catch (e: ClassCastException) {
+                            log.warn("Wrong target event: event type mismatch")
+                        } catch (e: Exception) {
+                            log.warn("Plugin occurred an exception: ", e)
                         }
+
                     }
                 }
             }
@@ -36,4 +50,6 @@ class PluginManager(private val plugins: MutableList<Plugin<*>>) {
             log.warn("Event handler process has an exception", e)
         }
     }
+
+
 }

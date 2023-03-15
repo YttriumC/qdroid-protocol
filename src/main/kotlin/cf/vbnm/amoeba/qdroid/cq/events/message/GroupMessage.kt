@@ -1,5 +1,6 @@
 package cf.vbnm.amoeba.qdroid.cq.events.message
 
+import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.events.BasePostEvent
 import cf.vbnm.amoeba.qdroid.cq.events.Message
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageSubType
@@ -16,13 +17,13 @@ class GroupMessage(
     @JsonProperty("sub_type")
     val subType: PostMessageSubType,
     @JsonProperty("message_id")
-    val messageId: Int,
+    messageId: Int,
     @JsonProperty("user_id")
-    val userId: Long,
+    userId: Long,
     @JsonProperty("message")
-    val message: MutableList<MessagePartial>,
+    message: MessageDetail,
     @JsonProperty("raw_message")
-    val rawMessage: String,
+    rawMessage: String,
     @JsonProperty("font")
     val font: Int,
     @JsonProperty("sender")
@@ -33,7 +34,7 @@ class GroupMessage(
     val groupId: Long,
     @JsonProperty("anonymous")
     val anonymous: Anonymous?,
-) : Message(selfId, time, PostMessageType.PRIVATE) {
+) : Message(selfId, time, messageId, PostMessageType.GROUP, message, rawMessage, userId) {
 
     override fun toGroupMessage(): GroupMessage {
         return this

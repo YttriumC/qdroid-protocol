@@ -1,8 +1,8 @@
 package cf.vbnm.amoeba.qdroid.cq.api.data
 
+import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.BaseApi
 import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
-import cf.vbnm.amoeba.qdroid.cq.events.message.MessagePartial
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
@@ -33,7 +33,7 @@ class GetForwardMsg(
     ) {
         data class ForwardMsgDetail(
             @JsonProperty("content")
-            val content: MutableList<MessagePartial>,
+            val content: MessageDetail,
             @JsonProperty("group_id")
             val groupId: Long,
             @JsonProperty("sender")

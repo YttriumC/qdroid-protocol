@@ -1,5 +1,6 @@
 package cf.vbnm.amoeba.qdroid.cq.events
 
+import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostType
 import cf.vbnm.amoeba.qdroid.cq.events.message.GroupMessage
@@ -12,8 +13,16 @@ abstract class Message(
     selfId: Long,
     @JsonProperty("time")
     time: Int,
+    @JsonProperty("message_id")
+    val messageId: Int,
     @JsonProperty("message_type")
-    val messageType: PostMessageType
+    val messageType: PostMessageType,
+    @JsonProperty("message")
+    val message: MessageDetail,
+    @JsonProperty("raw_message")
+    val rawMessage: String,
+    @JsonProperty("user_id")
+    val userId: Long,
 ) : BasePostEvent(selfId, time, PostType.MESSAGE) {
 
     open fun toGroupMessage(): GroupMessage {
@@ -34,6 +43,16 @@ abstract class Message(
 
     override fun toMessage(): Message {
         return this
+    }
+
+    override fun toString(): String {
+        return "messageId=$messageId, " +
+                "messageType=$messageType, " +
+                "message=$message, " +
+                "rawMessage='$rawMessage', " +
+                "userId=$userId" +
+                "," +
+                " ${super.toString()}"
     }
 
     companion object {

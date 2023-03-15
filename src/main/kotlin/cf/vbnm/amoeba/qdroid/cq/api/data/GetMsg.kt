@@ -1,9 +1,9 @@
 package cf.vbnm.amoeba.qdroid.cq.api.data
 
+import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.BaseApi
 import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
-import cf.vbnm.amoeba.qdroid.cq.events.message.MessagePartial
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
@@ -44,7 +44,7 @@ class GetMsg(
         @JsonProperty("time")
         val time: Int,
         @JsonProperty("message")
-        val message: MutableList<MessagePartial>,
+        val message: MessageDetail,
         @JsonProperty("raw_message")
         val rawMessage: String,
     ) {

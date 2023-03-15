@@ -25,6 +25,7 @@ open class Lifecycle(
     }
 
     companion object {
+        @Suppress("UNUSED")
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
             return Lifecycle(
                 (map["self_id"] as Number).toLong(),

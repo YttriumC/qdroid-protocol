@@ -2,7 +2,12 @@ package cf.vbnm.amoeba.qdroid.cq.api.enums
 
 import cf.vbnm.amoeba.qdroid.cq.api.BaseApi
 import cf.vbnm.amoeba.qdroid.cq.api.data.*
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
+@JsonSerialize(using = Action.Serializer::class)
 class Action<T : BaseApi<*>> private constructor(
     val action: String,
     val returnType: Class<T>,
@@ -31,7 +36,7 @@ class Action<T : BaseApi<*>> private constructor(
         val SET_FRIEND_ADD_REQUEST = Action("set_friend_add_request", NoData::class.java, 18)
         val SET_GROUP_ADD_REQUEST = Action("set_group_add_request", NoData::class.java, 19)
         val GET_LOGIN_INFO = Action("get_login_info", GetLoginInfo::class.java, 20)
-        val QIDIAN_GET_ACCOUNT_INFO = Action("qidian_get_account_info", GetQidianInfo::class.java, 21)
+        val GET_QIDIAN_ACCOUNT_INFO = Action("qidian_get_account_info", GetQidianInfo::class.java, 21)
         val SET_QQ_PROFILE = Action("set_qq_profile", NoData::class.java, 22)
         val GET_STRANGER_INFO = Action("get_stranger_info", GetStrangerInfo::class.java, 23)
         val GET_FRIEND_LIST = Action("get_friend_list", GetFriendList::class.java, 24)
@@ -77,6 +82,9 @@ class Action<T : BaseApi<*>> private constructor(
         val SET_MODEL_SHOW = Action("_set_model_show", NoData::class.java, 59)
         val DELETE_UNIDIRECTIONAL_FRIEND = Action("delete_unidirectional_friend", NoData::class.java, 60)
         val SEND_PRIVATE_FORWARD_MSG = Action("send_private_forward_msg", SendPrivateForwardMsg::class.java, 61)
+        val DELETE_FRIEND = Action("delete_friend", NoData::class.java, 64)
+        val SET_GROUP_NAME = Action("set_group_name", NoData::class.java, 65)
+        val HANDLE_QUICK_OPERATION = Action("_handle_quick_operation", NoData::class.java, 66)
     }
 
     fun cast(baseApi: BaseApi<*>): T {
@@ -99,5 +107,11 @@ class Action<T : BaseApi<*>> private constructor(
         return action
     }
 
+    class Serializer : JsonSerializer<Action<*>>() {
+        override fun serialize(value: Action<*>, gen: JsonGenerator, serializers: SerializerProvider?) {
+            gen.writeString(value.action)
+        }
+
+    }
 
 }
