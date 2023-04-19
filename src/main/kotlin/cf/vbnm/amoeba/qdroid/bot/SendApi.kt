@@ -7,201 +7,177 @@ import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
 
 interface SendApi {
 
-    fun getLoginInfo(callback: (GetLoginInfo) -> Unit)
+    suspend fun getLoginInfo(): GetLoginInfo
 
-    fun setQqProfile(
+    suspend fun setQqProfile(
         nickname: String,
         company: String,
         email: String,
         college: String,
         personalNote: String,
-        callback: (NoData) -> Unit
-    )
+    ): NoData
 
-    fun qidianGetAccountInfo(callback: (GetQidianInfo) -> Unit)
+    suspend fun qidianGetAccountInfo(): GetQidianInfo
 
-    fun getModelShow(model: String, callback: (GetModelShow) -> Unit)
+    suspend fun getModelShow(model: String): GetModelShow
 
-    fun setModelShow(model: String, modelShow: String, callback: (NoData) -> Unit)
+    suspend fun setModelShow(model: String, modelShow: String): NoData
 
-    fun getOnlineClients(noCache: Boolean, callback: (GetOnlineClients) -> Unit)
+    suspend fun getOnlineClients(noCache: Boolean): GetOnlineClients
 
-    fun getStrangerInfo(userId: Long, noCache: Boolean = false, callback: (GetStrangerInfo) -> Unit)
+    suspend fun getStrangerInfo(userId: Long, noCache: Boolean = false): GetStrangerInfo
 
-    fun getFriendList(callback: (GetFriendList) -> Unit)
+    suspend fun getFriendList(): GetFriendList
 
-    fun getUnidirectionalFriendList(callback: (GetUnidirectionalFriendList) -> Unit)
+    suspend fun getUnidirectionalFriendList(): GetUnidirectionalFriendList
 
-    fun deleteFriend(userId: Long, callback: (NoData) -> Unit)
+    suspend fun deleteFriend(userId: Long): NoData
 
-    fun deleteUnidirectionalFriend(callback: (NoData) -> Unit)
+    suspend fun deleteUnidirectionalFriend(): NoData
 
-    fun sendPrivateMsg(
+    suspend fun sendPrivateMsg(
         userId: Long,
         groupId: Long? = null,
         message: MessageDetail,
         autoEscape: Boolean = false,
-        callback: (MessageIdRet) -> Unit
-    )
+    ): MessageIdRet
 
-    fun sendGroupMsg(
-        groupId: Long,
-        message: MessageDetail,
-        autoEscape: Boolean = false,
-        callback: (MessageIdRet) -> Unit
-    )
+    suspend fun sendGroupMsg(
+        groupId: Long, message: MessageDetail, autoEscape: Boolean = false,
+    ): MessageIdRet
 
-    fun sendMsg(
+    suspend fun sendMsg(
         messageType: PostMessageType? = null,
         userId: Long?,
         groupId: Long?,
         message: MessageDetail,
         autoEscape: Boolean = false,
-        callback: (MessageIdRet) -> Unit
-    ) {
+    ): MessageIdRet {
         if (userId == null && groupId == null) {
             throw NullPointerException("Both of UserId and GroupId cannot be null")
         }
         try {
             messageType?.let {
                 return when (it) {
-                    PostMessageType.PRIVATE -> sendPrivateMsg(userId!!, groupId, message, autoEscape, callback)
-                    PostMessageType.GROUP -> sendGroupMsg(groupId!!, message, autoEscape, callback)
+                    PostMessageType.PRIVATE -> sendPrivateMsg(userId!!, groupId, message, autoEscape)
+                    PostMessageType.GROUP -> sendGroupMsg(groupId!!, message, autoEscape)
                 }
             }
         } catch (e: NullPointerException) {
             throw IllegalArgumentException("Message type cannot match the user id and group id")
         }
         userId?.let {
-            return sendPrivateMsg(userId, groupId, message, autoEscape, callback)
+            return sendPrivateMsg(userId, groupId, message, autoEscape)
         }
         groupId?.let {
-            return sendGroupMsg(groupId, message, autoEscape, callback)
+            return sendGroupMsg(groupId, message, autoEscape)
         }
         throw IllegalStateException("Unknown Exception")
     }
 
-    fun getMsg(messageId: Long, callback: (GetMsg) -> Unit)
+    suspend fun getMsg(messageId: Long): GetMsg
 
-    fun deleteMsg(messageId: Long, callback: (NoData) -> Unit)
+    suspend fun deleteMsg(messageId: Long): NoData
 
-    fun markMsgAsRead(messageId: Long, callback: (NoData) -> Unit)
+    suspend fun markMsgAsRead(messageId: Long): NoData
 
-    fun getForwardMsg(forwardMessageId: String, callback: (GetForwardMsg) -> Unit)
+    suspend fun getForwardMsg(forwardMessageId: String): GetForwardMsg
 
-//    fun sendGroupForwardMsg(groupId: Long,messages:List<MessagePartial>callback:(TODO
+//    suspend fun sendGroupForwardMsg(groupId: Long,messages:List<MessagePartial>)
 
-    fun getGroupMsgHistory(messageSeq: Long? = null, groupId: Long, callback: (GetGroupMsgHistory) -> Unit)
+    suspend fun getGroupMsgHistory(messageSeq: Long? = null, groupId: Long): GetGroupMsgHistory
 
-    fun getImage(file: String, callback: (GetImage) -> Unit)
+    suspend fun getImage(file: String): GetImage
 
-    fun canSendImage(callback: (CanDo) -> Unit)
+    suspend fun canSendImage(): CanDo
 
-//    fun ocrImage(image:String):
+//    suspend fun ocrImage(image:String):
 
-    fun canSendRecord(callback: (CanDo) -> Unit)
+    suspend fun canSendRecord(): CanDo
 
-    fun setFriendAddRequest(flag: String, approve: Boolean = true, remark: String, callback: (NoData) -> Unit)
+    suspend fun setFriendAddRequest(flag: String, approve: Boolean = true, remark: String): NoData
 
-    fun setGroupAddRequest(
-        flag: String,
-        subType: String,
-        approve: Boolean = true,
-        reason: String = "",
-        callback: (NoData) -> Unit
-    )
+    suspend fun setGroupAddRequest(
+        flag: String, subType: String, approve: Boolean = true, reason: String = "",
+    ): NoData
 
-    fun getGroupInfo(groupId: Long, noCache: Boolean = false, callback: (GetGroupInfo) -> Unit)
+    suspend fun getGroupInfo(groupId: Long, noCache: Boolean = false): GetGroupInfo
 
-    fun getGroupList(noCache: Boolean = false, callback: (GetGroupList) -> Unit)
+    suspend fun getGroupList(noCache: Boolean = false): GetGroupList
 
-    fun getGroupMemberInfo(
-        groupId: Long,
-        userId: Long,
-        noCache: Boolean = false,
-        callback: (GetGroupMemberInfo) -> Unit
-    )
+    suspend fun getGroupMemberInfo(
+        groupId: Long, userId: Long, noCache: Boolean = false,
+    ): GetGroupMemberInfo
 
-    fun getGroupMemberList(groupId: Long, noCache: Boolean = false, callback: (GetGroupMemberList) -> Unit)
+    suspend fun getGroupMemberList(groupId: Long, noCache: Boolean = false): GetGroupMemberList
 
-    fun getGroupHonorInfo(groupId: Long, type: String, callback: (GetGroupHonorInfo) -> Unit)
+    suspend fun getGroupHonorInfo(groupId: Long, type: String): GetGroupHonorInfo
 
-    //    fun getGroupSystemMsg():GetGroup
-    fun getEssenceMsgList(groupId: Long, callback: (GetEssenceMsgList) -> Unit)
+    //    suspend fun getGroupSystemMsg():GetGroup
+    suspend fun getEssenceMsgList(groupId: Long): GetEssenceMsgList
 
-    fun getGroupAtAllRemain(groupId: Long, callback: (GetGroupAtAllRemain) -> Unit)
+    suspend fun getGroupAtAllRemain(groupId: Long): GetGroupAtAllRemain
 
-    fun setGroupName(groupId: Long, groupName: String, callback: (NoData) -> Unit)
+    suspend fun setGroupName(groupId: Long, groupName: String): NoData
 
-    fun setGroupPortrait(groupId: Long, file: String, cache: Int = 1, callback: (NoData) -> Unit)
+    suspend fun setGroupPortrait(groupId: Long, file: String, cache: Int = 1): NoData
 
-    fun setGroupAdmin(groupId: Long, userId: Long, enable: Boolean = true, callback: (NoData) -> Unit)
+    suspend fun setGroupAdmin(groupId: Long, userId: Long, enable: Boolean = true): NoData
 
-    fun setGroupCard(groupId: Long, userId: Long, card: String = "", callback: (NoData) -> Unit)
+    suspend fun setGroupCard(groupId: Long, userId: Long, card: String = ""): NoData
 
-    fun setGroupSpecialTitle(
-        groupId: Long,
-        userId: Long,
-        specialTitle: String = "",
-        duration: Int = -1, callback: (NoData) -> Unit
-    )
+    suspend fun setGroupSpecialTitle(
+        groupId: Long, userId: Long, specialTitle: String = "", duration: Int = -1,
+    ): NoData
 
-    fun setGroupBan(groupId: Long, userId: Long, duration: Int = 30 * 60, callback: (NoData) -> Unit)
+    suspend fun setGroupBan(groupId: Long, userId: Long, duration: Int = 30 * 60): NoData
 
-    fun setGroupWholeBan(groupId: Long, enable: Boolean = true, callback: (NoData) -> Unit)
+    suspend fun setGroupWholeBan(groupId: Long, enable: Boolean = true): NoData
 
-    fun setGroupAnonymousBan(
-        groupId: Long,
-        anonymous: Any?,
-        anonymousFlag: String?,
-        duration: Int,
-        callback: (NoData) -> Unit
-    )
+    suspend fun setGroupAnonymousBan(
+        groupId: Long, anonymous: Any?, anonymousFlag: String?, duration: Int,
+    ): NoData
 
-    fun setEssenceMsg(messageId: Long, callback: (NoData) -> Unit)
+    suspend fun setEssenceMsg(messageId: Long): NoData
 
-    fun sendGroupSign(groupId: Long, callback: (NoData) -> Unit)
+    suspend fun sendGroupSign(groupId: Long): NoData
 
-    fun sendGroupNotice(groupId: Long, content: String, image: String?, callback: (NoData) -> Unit)
+    suspend fun sendGroupNotice(groupId: Long, content: String, image: String?): NoData
 
-    fun getGroupNotice(groupId: Long, callback: (GetGroupNotice) -> Unit)
+    suspend fun getGroupNotice(groupId: Long): GetGroupNotice
 
-    fun setGroupKick(groupId: Long, userId: Long, rejectAddRequest: Boolean = false, callback: (NoData) -> Unit)
+    suspend fun setGroupKick(groupId: Long, userId: Long, rejectAddRequest: Boolean = false): NoData
 
-    fun setGroupLeave(groupId: Long, isDismiss: Boolean = false, callback: (NoData) -> Unit)
+    suspend fun setGroupLeave(groupId: Long, isDismiss: Boolean = false): NoData
 
-    fun uploadGroupFile(groupId: Long, file: String, name: String, folder: String, callback: (NoData) -> Unit)
+    suspend fun uploadGroupFile(groupId: Long, file: String, name: String, folder: String): NoData
 
-    fun deleteGroupFile(groupId: Long, fileId: String, busid: Int, callback: (NoData) -> Unit)
+    suspend fun deleteGroupFile(groupId: Long, fileId: String, busid: Int): NoData
 
-    fun createGroupFileFolder(groupId: Long, name: String, parentId: String = "/", callback: (NoData) -> Unit)
+    suspend fun createGroupFileFolder(groupId: Long, name: String, parentId: String = "/"): NoData
 
-    fun deleteGroupFolder(groupId: Long, folderId: String, callback: (NoData) -> Unit)
+    suspend fun deleteGroupFolder(groupId: Long, folderId: String): NoData
 
-    fun getGroupFileSystemInfo(groupId: Long, callback: (GetGroupFileSystemInfo) -> Unit)
+    suspend fun getGroupFileSystemInfo(groupId: Long): GetGroupFileSystemInfo
 
-    fun getGroupFilesByFolder(groupId: Long, folderId: String, callback: (GetGroupFilesByFolder) -> Unit)
+    suspend fun getGroupFilesByFolder(groupId: Long, folderId: String): GetGroupFilesByFolder
 
-    fun getGroupFileUrl(groupId: Long, fileId: String, busid: Int, callback: (GetGroupFileUrl) -> Unit)
+    suspend fun getGroupFileUrl(groupId: Long, fileId: String, busid: Int): GetGroupFileUrl
 
-    fun uploadPrivateFile(userId: Long, file: String, name: String, callback: (NoData) -> Unit)
+    suspend fun uploadPrivateFile(userId: Long, file: String, name: String): NoData
 
-    fun getVersionInfo(callback: (GetVersionInfo) -> Unit)
+    suspend fun getVersionInfo(): GetVersionInfo
 
-    fun getStatus(callback: (GetStatus) -> Unit)
+    suspend fun getStatus(): GetStatus
 
-    fun reloadEventFilter(file: String, callback: (NoData) -> Unit)
+    suspend fun reloadEventFilter(file: String): NoData
 
-    fun downloadFile(
-        url: String,
-        threadCount: Int = 4,
-        vararg headers: Pair<String, String>,
-        callback: (DownloadFile) -> Unit
-    )
+    suspend fun downloadFile(
+        url: String, threadCount: Int = 4, vararg headers: Pair<String, String>,
+    ): DownloadFile
 
-    fun checkUrlSafely(url: String, callback: (CheckUrlSafely) -> Unit)
+    suspend fun checkUrlSafely(url: String): CheckUrlSafely
+//    suspend fun getWordSlices()
 
-//    fun getWordSlices()
-
-    fun handleQuickOperation(context: BasePostEvent, operation: Any, callback: (NoData) -> Unit)
+    suspend fun handleQuickOperation(context: BasePostEvent, operation: Any): NoData
 }

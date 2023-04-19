@@ -10,6 +10,11 @@ class MessageDetail : ArrayList<MessageDetail.MessagePartial>() {
         return this
     }
 
+    fun addReply(id: Int): MessageDetail {
+        add(MessagePartial(MessagePartialType.TEXT, mutableMapOf(Pair("id", id))))
+        return this
+    }
+
     fun addAt(user: Long): MessageDetail {
         add(MessagePartial(MessagePartialType.AT, mutableMapOf(Pair("qq", user))))
         return this
@@ -40,6 +45,10 @@ class MessageDetail : ArrayList<MessageDetail.MessagePartial>() {
         fun at(user: Long): MessagePartial {
             return MessagePartial(MessagePartialType.AT, mutableMapOf(Pair("qq", user)))
 
+        }
+
+        fun oneText(charSequence: CharSequence): MessageDetail {
+            return MessageDetail().addText(charSequence.toString())
         }
     }
 

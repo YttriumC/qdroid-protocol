@@ -1,4 +1,4 @@
-package cf.vbnm.amoeba.qdroid.bot.plugin
+package cf.vbnm.amoeba.qdroid.bot.plugin.event
 
 import cf.vbnm.amoeba.core.CoreProperty
 import cf.vbnm.amoeba.qdroid.bot.QBot
@@ -6,8 +6,8 @@ import cf.vbnm.amoeba.qdroid.cq.events.BasePostEvent
 import org.quartz.Scheduler
 import kotlin.reflect.KClass
 
-abstract class BasePlugin<T : BasePostEvent>(
-    protected val coreProperty: CoreProperty,
+abstract class BaseEventPlugin<T : BasePostEvent>(
+    protected open val coreProperty: CoreProperty,
     protected val scheduler: Scheduler,
     protected val pluginMessageFilter: PluginMessageFilter
 ) {
@@ -16,19 +16,20 @@ abstract class BasePlugin<T : BasePostEvent>(
     /**
      * For reflect use, against type erasure
      * */
-    abstract fun getTypeParameterClass(): KClass<*>
+    abstract fun getTypeParameterClass(): KClass<T>
+
+
+    abstract suspend fun apply(bot: QBot, event: T)
 
     /**
-     * @return true 表示执行完毕, 后续任务不再执行, false表示未执行完, 将执行后续任务
+     * 调用后表示执行完毕, 后续任务不再执行,未调用则表示未执行完, 将执行后续任务
      * */
-    abstract fun apply(bot: QBot, event: T)
-
     fun abortFilter() {
         abort.set(true)
     }
 
     @Suppress("UNUSED")
-    fun handleEvent(bot: QBot, event: T): Boolean {
+    suspend fun handleEvent(bot: QBot, event: T): Boolean {
         apply(bot, event)
         return abort.get().also { abort.remove() }
     }
@@ -36,6 +37,5 @@ abstract class BasePlugin<T : BasePostEvent>(
     fun PluginMessageInterceptor.finished() {
         pluginMessageFilter.removeInterceptor(this)
     }
-
 
 }

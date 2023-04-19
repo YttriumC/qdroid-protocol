@@ -1,17 +1,18 @@
 package cf.vbnm.amoeba.qdroid.bot
 
-import cf.vbnm.amoeba.qdroid.bot.plugin.PluginManager
+import cf.vbnm.amoeba.core.log.Slf4kt
+import cf.vbnm.amoeba.qdroid.bot.plugin.EventPluginManager
 import cf.vbnm.amoeba.qdroid.cq.events.BasePostEvent
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.quartz.Scheduler
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.WebSocketSession
+
+private val log = Slf4kt.getLogger(BotManager::class.java)
 
 @Component
 class BotManager(
     private val objectMapper: ObjectMapper,
-    private val scheduler: Scheduler,
-    private val pluginManager: PluginManager
+    private val eventPluginManager: EventPluginManager
 ) :
     HashMap<Long, QBot>() {
 
@@ -23,7 +24,7 @@ class BotManager(
                 val lifecycle = metaEvent.takeIf { it.isLifecycle() }?.toLifecycle() ?: return
                 var qBot = get(lifecycle.selfId)
                 if (qBot == null) {
-                    qBot = QBot(lifecycle.selfId, objectMapper, scheduler, pluginManager)
+                    qBot = QBot(lifecycle.selfId, objectMapper, eventPluginManager)
                 }
                 put(lifecycle.selfId, qBot)
                 qBot.setWebSocketSession(session)
@@ -34,7 +35,7 @@ class BotManager(
             get((map["echo"] as String).split(':')[0].toLong())?.let {
                 it.setWebSocketSession(session)
                 it.handleApi(map)
-            }
+            } ?: log.info("Non-mapped message: {}", map)
         }
     }
 }

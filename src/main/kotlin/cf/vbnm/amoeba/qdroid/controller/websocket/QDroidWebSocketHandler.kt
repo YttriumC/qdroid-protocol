@@ -29,19 +29,19 @@ class QDroidWebSocketHandler(private val objectMapper: ObjectMapper, private val
         log.info("Connect Established: {}", session)
     }
 
+
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         try {
             val map = objectMapper.readValue(
                 message.payload,
                 object : TypeReference<Map<String, Any?>>() {}
             )
-
-            botManager.handleMessages(session, map)
             if (BasePostEvent.isPostEvent(map)) {
                 val event = BasePostEvent.parseEvent(map, objectMapper)
                 if (!event.isMetaEvent())
                     log.debug("Received event: {}", event)
             }
+            botManager.handleMessages(session, map)
         } catch (e: Exception) {
             log.warn("Handle message error", e)
         }

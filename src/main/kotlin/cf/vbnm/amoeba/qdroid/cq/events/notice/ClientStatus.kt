@@ -15,7 +15,7 @@ class ClientStatus(
     val clients: MutableList<Device>,
     @JsonProperty("online")
     val online: Boolean,
-) : Notice(selfId, time, PostNoticeType.FRIEND_RECALL) {
+) : Notice(selfId, time, PostNoticeType.CLIENT_STATUS) {
 
     override fun toClientStatus(): ClientStatus {
         return this

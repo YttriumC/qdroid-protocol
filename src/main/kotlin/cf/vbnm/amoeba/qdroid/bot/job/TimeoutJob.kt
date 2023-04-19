@@ -2,6 +2,8 @@ package cf.vbnm.amoeba.qdroid.bot.job
 
 import cf.vbnm.amoeba.annotation.JobIdentity
 import cf.vbnm.amoeba.core.log.Slf4kt
+import cf.vbnm.amoeba.qdroid.bot.job.TimeoutJob.Companion.INVOKE_JOB_GROUP_NAME
+import cf.vbnm.amoeba.qdroid.bot.job.TimeoutJob.Companion.INVOKE_TIMEOUT_JOB_NAME
 import cf.vbnm.amoeba.qdroid.bot.util.toDate
 import org.quartz.*
 import org.springframework.stereotype.Component
@@ -9,8 +11,7 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-const val INVOKE_JOB_GROUP_NAME = "plugin"
-const val INVOKE_TIMEOUT_JOB_NAME = "timeoutJob"
+
 private val log = Slf4kt.getLogger(TimeoutJob::class.java)
 
 @Component
@@ -19,6 +20,7 @@ class TimeoutJob : Job {
     override fun execute(context: JobExecutionContext) {
         context.trigger.jobDataMap?.let {
             val invoke = it["invoke"]
+            log.info("fired timeout trigger")
             @Suppress("UNCHECKED_CAST")
             invoke as () -> Unit
             invoke.invoke()
@@ -30,6 +32,9 @@ class TimeoutJob : Job {
     }
 
     companion object {
+        const val INVOKE_TIMEOUT_JOB_NAME = "TimeoutJob"
+        const val INVOKE_JOB_GROUP_NAME = "timeoutGroup"
+
         fun addTimeoutJob(
             scheduler: Scheduler,
             duration: Long,

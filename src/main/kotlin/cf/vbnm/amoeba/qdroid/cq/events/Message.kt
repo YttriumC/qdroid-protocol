@@ -1,12 +1,17 @@
 package cf.vbnm.amoeba.qdroid.cq.events
 
+import cf.vbnm.amoeba.core.log.Slf4kt
+import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
+import cf.vbnm.amoeba.qdroid.cq.api.data.MessageIdRet
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostType
 import cf.vbnm.amoeba.qdroid.cq.events.message.GroupMessage
 import cf.vbnm.amoeba.qdroid.cq.events.message.PrivateMessage
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
+
+private val log = Slf4kt.getLogger(Message::class.java)
 
 abstract class Message(
     @JsonProperty("self_id")
@@ -24,6 +29,23 @@ abstract class Message(
     @JsonProperty("user_id")
     val userId: Long,
 ) : BasePostEvent(selfId, time, PostType.MESSAGE) {
+
+    suspend fun reply(bot: QBot, message: MessageDetail): MessageIdRet {
+        log.info("Reply to {}: {}", this.userId, message)
+        return when (messageType) {
+            PostMessageType.PRIVATE -> {
+                val privateMessage = toPrivateMessage()
+                privateMessage.tempSource?.let {
+                    bot.sendPrivateMsg(userId, privateMessage.sender.groupId, message)
+                } ?: bot.sendPrivateMsg(userId, message = message)
+            }
+
+            PostMessageType.GROUP -> {
+                val groupMessage = toGroupMessage()
+                bot.sendGroupMsg(groupMessage.groupId, message)
+            }
+        }
+    }
 
     open fun toGroupMessage(): GroupMessage {
         throw TypeCastException("Cannot cast message $messageType to GroupMessage")
