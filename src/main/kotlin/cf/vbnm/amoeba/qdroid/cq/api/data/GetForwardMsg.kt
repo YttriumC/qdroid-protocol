@@ -2,6 +2,7 @@ package cf.vbnm.amoeba.qdroid.cq.api.data
 
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.BaseApi
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Retcode
 import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -10,7 +11,7 @@ class GetForwardMsg(
     @JsonProperty("status")
     status: Status,
     @JsonProperty("retcode")
-    retcode: Int,
+    retcode: Retcode,
     @JsonProperty("msg")
     msg: String? = null,
     @JsonProperty("wording")

@@ -63,9 +63,7 @@ class QBot(
     }
 
     private suspend inline fun <reified R : BaseApi<*>, T : Action<R>> send(
-        wsSession: WebSocketSession, action: T,/*
-        noinline ,*/
-        vararg params: Pair<String, Any?>
+        wsSession: WebSocketSession, action: T, vararg params: Pair<String, Any?>
     ): R {
         val seq = newSeq()
         val paramMap: MutableMap<String, Any?> = HashMap()

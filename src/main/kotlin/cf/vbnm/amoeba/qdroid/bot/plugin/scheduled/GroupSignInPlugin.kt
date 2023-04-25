@@ -22,6 +22,6 @@ class GroupSignInPlugin(coreProperty: CoreProperty) : BaseScheduledPlugin(
 
     override fun initTrigger() {
         addCronTrigger("5 0 0 * * ?")
-//        addCronTrigger("5 23 0 * * ?")
+//        addCronTrigger("5 54 0 * * ?")
     }
 }

@@ -1,14 +1,14 @@
 package cf.vbnm.amoeba.qdroid.cq.api
 
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Retcode
 import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
 
 abstract class BaseApi<T>(
     @JsonProperty("status")
     val status: Status,
     @JsonProperty("retcode")
-    val retcode: Int,
+    val retcode: Retcode,
     @JsonProperty("msg")
     val msg: String? = null,
     @JsonProperty("wording")

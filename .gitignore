@@ -2,8 +2,9 @@ libs/
 build/
 .gradle/
 .idea/
-gradle/
+/gradle/
 
 /db/
 
 QDroidStarter.kt
+/out/

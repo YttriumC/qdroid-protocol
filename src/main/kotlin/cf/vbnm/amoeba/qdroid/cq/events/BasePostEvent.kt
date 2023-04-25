@@ -2,8 +2,8 @@ package cf.vbnm.amoeba.qdroid.cq.events
 
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostType
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 
 abstract class BasePostEvent(
     @JsonProperty("self_id")
@@ -57,7 +57,7 @@ abstract class BasePostEvent(
         }
 
         fun isPostEvent(message: String, objectMapper: ObjectMapper): Boolean {
-            val map = objectMapper.readValue<Map<String, Any?>>(message)
+            val map = objectMapper.readValue(message, object : TypeReference<Map<String, Any?>>() {})
             return isPostEvent(map)
         }
 

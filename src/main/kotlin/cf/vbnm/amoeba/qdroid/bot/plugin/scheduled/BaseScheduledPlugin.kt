@@ -5,6 +5,7 @@ import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.BotManager
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.bot.job.ScheduledJob
+import cf.vbnm.amoeba.qdroid.bot.plugin.AbstractPlugin
 import cf.vbnm.amoeba.qdroid.bot.util.toDate
 import kotlinx.coroutines.runBlocking
 import org.quartz.*
@@ -17,7 +18,7 @@ private val log = Slf4kt.getLogger(BaseScheduledPlugin::class.java)
 
 abstract class BaseScheduledPlugin(
     protected val coreProperty: CoreProperty
-) {
+) : AbstractPlugin() {
     private lateinit var _scheduler: Scheduler
     private lateinit var botManager: BotManager
     protected val scheduler: Scheduler
@@ -54,7 +55,10 @@ abstract class BaseScheduledPlugin(
             withIdentity(name, ScheduledJob.INVOKE_SCHEDULED_GROUP_NAME)
             build()
         })
-        return Pair(name, ScheduledJob.INVOKE_SCHEDULED_GROUP_NAME).also { log.info("added a cron trigger:, {}", it) }
+        return Pair(
+            name,
+            ScheduledJob.INVOKE_SCHEDULED_GROUP_NAME
+        ).also { log.info("added a cron trigger, cron: {}, {}", cron, it) }
     }
 
     fun addCronTriggerWithTask(cron: String, invoke: suspend (botManager: BotManager) -> Unit): Pair<String, String> {
@@ -65,7 +69,10 @@ abstract class BaseScheduledPlugin(
             forJob(ScheduledJob.INVOKE_SCHEDULED_JOB_NAME, ScheduledJob.INVOKE_SCHEDULED_GROUP_NAME)
             withIdentity(name, ScheduledJob.INVOKE_SCHEDULED_GROUP_NAME); build()
         })
-        return Pair(name, ScheduledJob.INVOKE_SCHEDULED_GROUP_NAME).also { log.info("added a cron trigger:, {}", it) }
+        return Pair(
+            name,
+            ScheduledJob.INVOKE_SCHEDULED_GROUP_NAME
+        ).also { log.info("added a cron trigger, cron: {}, {}", cron, it) }
     }
 
     /*

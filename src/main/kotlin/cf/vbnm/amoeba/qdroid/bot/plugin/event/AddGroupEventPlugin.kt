@@ -7,7 +7,6 @@ import cf.vbnm.amoeba.qdroid.const.Constant
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.events.Message
 import cf.vbnm.amoeba.qdroid.cq.events.request.GroupRequest
-import org.quartz.Scheduler
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -16,16 +15,14 @@ import kotlin.reflect.KClass
 @Component
 class AddGroupEventPlugin(
     coreProperty: CoreProperty,
-    scheduler: Scheduler,
     pluginMessageFilter: PluginMessageFilter
 ) : BaseEventPlugin<GroupRequest>(
-    coreProperty, scheduler, pluginMessageFilter
+    coreProperty, pluginMessageFilter
 ) {
 
     override suspend fun apply(bot: QBot, event: GroupRequest) {
         if (event.subType == "invite") {
             bot.setGroupAddRequest(event.flag, event.subType)
-            abortFilter()
             return
         }
         coreProperty.getWildcardProperty(event.run {

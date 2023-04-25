@@ -100,7 +100,7 @@ class Action<T : BaseApi<*>> private constructor(
     }
 
     override fun hashCode(): Int {
-        return ordinal
+        return ordinal.hashCode()
     }
 
     override fun toString(): String {

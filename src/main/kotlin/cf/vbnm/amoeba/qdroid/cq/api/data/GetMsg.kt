@@ -1,17 +1,22 @@
 package cf.vbnm.amoeba.qdroid.cq.api.data
 
+import cf.vbnm.amoeba.core.log.Slf4kt
+import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.BaseApi
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Retcode
 import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
+private val log = Slf4kt.getLogger(GetMsg::class.java)
+
 class GetMsg(
     @JsonProperty("status")
     status: Status,
     @JsonProperty("retcode")
-    retcode: Int,
+    retcode: Retcode,
     @JsonProperty("msg")
     msg: String? = null,
     @JsonProperty("wording")
@@ -26,6 +31,22 @@ class GetMsg(
         fun parseApiRet(map: Map<String, Any?>, objectMapper: ObjectMapper): BaseApi<*> {
             return objectMapper.convertValue(map, GetMsg::class.java)
         }
+    }
+
+    suspend fun reply(bot: QBot, message: MessageDetail): MessageIdRet {
+        data?.let {
+            log.info("Reply to {}: {}", this.data.sender.userId, message)
+            return when (data.messageType) {
+                PostMessageType.PRIVATE -> {
+                    bot.sendPrivateMsg(this.data.sender.userId, message = message)
+                }
+
+                PostMessageType.GROUP -> {
+                    bot.sendGroupMsg(data.groupId!!, message)
+                }
+            }
+        }
+        throw NullPointerException("This api has no data.")
     }
 
     data class MsgDetail(
@@ -46,7 +67,7 @@ class GetMsg(
         @JsonProperty("message")
         val message: MessageDetail,
         @JsonProperty("raw_message")
-        val rawMessage: String,
+        val rawMessage: String?,
     ) {
         data class Sender(
             @JsonProperty("nickname")

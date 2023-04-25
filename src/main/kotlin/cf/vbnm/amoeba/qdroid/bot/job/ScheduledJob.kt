@@ -23,7 +23,7 @@ class ScheduledJob : Job {
         context.trigger.jobDataMap?.let {
             val invoke = it["invoke"]
             val botManager = it["botManager"] as BotManager
-            log.debug("ScheduledJob execute")
+            log.info("ScheduledJob execute")
             @Suppress("UNCHECKED_CAST")
             invoke as suspend (botManager: BotManager) -> Unit
             @OptIn(DelicateCoroutinesApi::class)

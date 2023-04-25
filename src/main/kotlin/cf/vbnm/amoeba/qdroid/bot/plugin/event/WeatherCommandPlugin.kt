@@ -1,14 +1,13 @@
 package cf.vbnm.amoeba.qdroid.bot.plugin.event
 
-import cf.vbnm.amoeba.core.CoreProperty
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.bot.plugin.PluginOrder
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
+import cf.vbnm.amoeba.qdroid.cq.code.data.Reply
+import cf.vbnm.amoeba.qdroid.cq.code.data.Text
 import cf.vbnm.amoeba.qdroid.cq.events.Message
-import cf.vbnm.amoeba.qdroid.cq.events.enums.MessagePartialType
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.google.common.base.Splitter
-import org.quartz.Scheduler
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
@@ -16,77 +15,49 @@ import org.springframework.web.client.getForObject
 @PluginOrder(100)
 @Component
 class WeatherCommandPlugin(
-    coreProperty: CoreProperty,
-    scheduler: Scheduler,
-    pluginMessageFilter: PluginMessageFilter,
     private val restTemplate: RestTemplate
-) : MessageCommandPlugin(
-    coreProperty,
-    scheduler, pluginMessageFilter
-) {
+) : MessageCommand() {
     override fun getPrefixes() = arrayOf("天气", "/天气")
-
-    override suspend fun handle(bot: QBot, event: Message) {
-        val list = Splitter.on(' ').omitEmptyStrings().splitToList(event.message.getText())
+    override fun getPluginName(): String = "weather"
+    override suspend fun handle(bot: QBot, msg: Message) {
+        val list = Splitter.on(' ').omitEmptyStrings().splitToList(msg.message.getText())
         if (list.size < 2) {
-            event.reply(bot, MessageDetail().apply {
-                addText("请按照下列格式输入: \r\n天气  北京")
-                add(
-                    MessageDetail.MessagePartial(
-                        MessagePartialType.REPLY, mapOf(
-                            Pair("id", event.messageId)
-                        )
-                    )
-                )
-            })
-
-        } else {
-            val code = coreProperty["plugin.weather.secretCode"]
-            if (code == "") {
-                event.reply(
-                    bot,
-                    MessageDetail().apply {
-                        addText("请设置secretCode, key=plugin.weather.secretCode")
-                    },
-                )
-            }
-            val weatherData = restTemplate.getForObject<WeatherData>(
-                "https://api.seniverse.com/v3/weather/daily.json?" +
-                        "key=${coreProperty["plugin.weather.secretCode"]}&location=${list[1]}&language=zh-Hans&unit=c&start=0&days=3"
-            )
-            val text = StringBuilder()
-            if (weatherData.results.isNotEmpty()) {
-                text.append("位置: ${weatherData.results[0].location.name}\r\n")
-                weatherData.results[0].daily.forEach {
-                    text.append("日期: ")
-                    text.append(it.date)
-                    text.append("\r\n")
-                    text.append("白天: ${it.textDay}, 晚间: ${it.textNight}")
-                    text.append("\r\n")
-                    text.append("最高温度: ${it.high}℃,最低温度: ${it.low}℃")
-                    text.append("\r\n")
-                    text.append("相对湿度: ${it.humidity}%")
-                    text.append("\r\n")
-                }
-                text.append("数据更新时间: ${weatherData.results[0].lastUpdate}")
-            } else {
-                text.append("未查询到相关信息")
-            }
-            event.reply(
-                bot,
-                MessageDetail().apply {
-                    addText(text.toString())
-                    add(
-                        MessageDetail.MessagePartial(
-                            MessagePartialType.REPLY, mapOf(
-                                Pair("id", event.messageId)
-                            )
-                        )
-                    )
-                },
-            )
+            msg.reply(bot, MessageDetail.of(Text("请按照下列格式输入: \r\n天气  北京"), Reply(msg.messageId)))
+            return
         }
+        val code = this["secretCode"]
+        if (code == null) {
+            msg.reply(
+                bot,
+                MessageDetail.of(Text("请设置secretCode, key=plugin.weather.secretCode"), Reply(msg.messageId)),
+            )
+            return
+        }
+        val weatherData = restTemplate.getForObject<WeatherData>(
+            "https://api.seniverse.com/v3/weather/daily.json?" +
+                    "key=$code&location=${list[1]}&language=zh-Hans&unit=c&start=0&days=3"
+        )
+        val text = StringBuilder()
+        if (weatherData.results.isNotEmpty()) {
+            text.append("位置: ${weatherData.results[0].location.name}\r\n")
+            weatherData.results[0].daily.forEach {
+                text.append("日期: ")
+                text.append(it.date)
+                text.append("\r\n")
+                text.append("白天: ${it.textDay}, 晚间: ${it.textNight}")
+                text.append("\r\n")
+                text.append("最高温度: ${it.high}℃,最低温度: ${it.low}℃")
+                text.append("\r\n")
+                text.append("相对湿度: ${it.humidity}%")
+                text.append("\r\n")
+            }
+            text.append("数据更新时间: ${weatherData.results[0].lastUpdate}")
+        } else {
+            text.append("未查询到相关信息")
+        }
+        msg.reply(bot, MessageDetail.of(Text(text.toString()), Reply(msg.messageId)))
     }
+
 }
 
 data class WeatherData(

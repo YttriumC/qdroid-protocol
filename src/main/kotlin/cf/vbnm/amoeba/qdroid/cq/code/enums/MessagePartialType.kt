@@ -1,4 +1,4 @@
-package cf.vbnm.amoeba.qdroid.cq.events.enums
+package cf.vbnm.amoeba.qdroid.cq.code.enums
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
  * */
 @JsonDeserialize(using = MessagePartialType.Deserializer::class)
 @JsonSerialize(using = MessagePartialType.Serializer::class)
+@Deprecated("Use MsgPartialType")
 enum class MessagePartialType(val type: String, val desc: String) {
     TEXT("text", "文字消息"),
     FACE("face", "QQ 表情"),
