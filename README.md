@@ -22,3 +22,9 @@
 如果没有ChatGPT官方API额度, 可以尝试:
 [ChatGPT代理api](https://api2d.com/r/189820)
 
+## 开源协议
+
+![GPLv3](https://www.gnu.org/graphics/gplv3-or-later.svg)
+
+[协议详情](https://www.gnu.org/licenses/gpl-3.0.txt)
+
