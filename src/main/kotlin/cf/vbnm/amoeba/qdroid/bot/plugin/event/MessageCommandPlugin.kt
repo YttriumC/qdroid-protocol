@@ -113,12 +113,12 @@ abstract class MessageCommand {
     fun removePrefix(str: String): String {
         var s = str.trimStart()
         getPrefixes().forEach {
-            val res = s.removePrefix(it)
+            val res = s.removePrefix("$it ")
             if (res.length == s.length) {
                 s = res
             } else
                 return res
         }
-        return s
+        return s.trimStart()
     }
 }

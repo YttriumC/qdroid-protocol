@@ -29,7 +29,10 @@ class WeatherCommandPlugin(
         if (code == null) {
             msg.reply(
                 bot,
-                MessageDetail.of(Text("请设置secretCode, key=plugin.weather.secretCode"), Reply(msg.messageId)),
+                MessageDetail.of(
+                    Text("请设置secretCode, key=plugin.msgCommand.weather.secretCode"),
+                    Reply(msg.messageId)
+                ),
             )
             return
         }

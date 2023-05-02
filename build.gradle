@@ -74,7 +74,7 @@ dependencies {
     runtimeOnly(fileTree(dir: 'libs', includes: ['*.jar']))
     implementation "org.quartz-scheduler:quartz:$quartzVersion"
     implementation "com.google.guava:guava:$guavaVersion"
-    implementation "cf.vbnm.chatgpt:ChatGPT4Java:1.0.4-jre17-SNAPSHOT"
+    implementation "cf.vbnm.chatgpt:ChatGPT4Java:1.1.5-jre17-SNAPSHOT"
 }
 
 

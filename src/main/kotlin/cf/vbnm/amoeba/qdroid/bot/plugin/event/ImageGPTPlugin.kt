@@ -4,6 +4,7 @@ import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.code.data.Image
 import cf.vbnm.amoeba.qdroid.cq.events.Message
+import cf.vbnm.chatgpt.client.ChatGPTClient
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.JsonGenerator
@@ -18,18 +19,23 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 
 @Component
-class ImageGPTPlugin(private val restTemplate: RestTemplate) : MessageCommand() {
+class ImageGPTPlugin(private val restTemplate: RestTemplate, private val chatGPT: ChatGPTClient) : MessageCommand() {
     override fun getPrefixes(): Array<String> = arrayOf("image", "/image")
+    override fun getPluginName(): String = "chatGPT"
 
     override suspend fun handle(bot: QBot, msg: Message) {
-        /*val parts = Splitter.on(' ').omitEmptyStrings().splitToList(msg.message.getText())
-        if ((parts.size > 2)) {
-            ImageSize.parseSize(parts[1])?.let {
-                HttpEntity(ImageReq(removePrefix(msg.message.getText()),))
-            }
-        }*/
+
+        /*        val imageResp = chatGPT.generationImage(removePrefix(msg.message.getText()))
+                imageResp.data.forEach {
+                    val file = bot.downloadFile(it.url)
+                    msg.reply(
+                        bot,
+                        MessageDetail().addReply(msg.messageId)
+                            .addNotReply(Image("file:///${file.data.filePath}", threads = 1))
+                    )
+                }*/
         val headers = HttpHeaders()
-        headers.setBearerAuth("fk189820-RHya5FVWmapkG0JXPmfyjTB6vpTLedav")
+        headers.setBearerAuth(this["key"]!!)
         headers.contentType = MediaType.APPLICATION_JSON
         val httpEntity = HttpEntity(ImageReq(removePrefix(msg.message.getText())), headers)
         val imgResp = restTemplate.exchange(
@@ -41,11 +47,11 @@ class ImageGPTPlugin(private val restTemplate: RestTemplate) : MessageCommand() 
 
         imgResp.body?.let { resp ->
             resp.data.forEach {
-
+                val file = bot.downloadFile(it.url)
                 msg.reply(
                     bot,
                     MessageDetail().addReply(msg.messageId)
-                        .addNotReply(Image(it.url, threads = 1))
+                        .addNotReply(Image("file:///${file.data.filePath}", threads = 1))
                 )
             }
         }
