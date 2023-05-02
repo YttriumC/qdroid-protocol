@@ -16,10 +16,8 @@ class Timeout(
     @JsonProperty("wording")
     wording: String? = null,
     @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: Unit
-) : BaseApi<Unit>(status, retcode, msg, wording, echo, null) {
+    echo: String? = null
+) : BaseApi<Unit>(status, retcode, msg, wording, echo, Unit) {
 
     companion object {
         fun parseApiRet(map: Map<String, Any?>, objectMapper: ObjectMapper): BaseApi<*> {

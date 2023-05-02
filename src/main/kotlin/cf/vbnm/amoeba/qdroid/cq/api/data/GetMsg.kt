@@ -34,38 +34,28 @@ class GetMsg(
     }
 
     suspend fun reply(bot: QBot, message: MessageDetail): MessageIdRet {
-        data?.let {
-            log.info("Reply to {}: {}", this.data.sender.userId, message)
-            return when (data.messageType) {
-                PostMessageType.PRIVATE -> {
-                    bot.sendPrivateMsg(this.data.sender.userId, message = message)
-                }
+        log.info("Reply to {}: {}", this.data.sender.userId, message)
+        return when (data.messageType) {
+            PostMessageType.PRIVATE -> {
+                bot.sendPrivateMsg(this.data.sender.userId, message = message)
+            }
 
-                PostMessageType.GROUP -> {
-                    bot.sendGroupMsg(data.groupId!!, message)
-                }
+            PostMessageType.GROUP -> {
+                bot.sendGroupMsg(data.groupId!!, message)
             }
         }
-        throw NullPointerException("This api has no data.")
     }
 
     data class MsgDetail(
-        @JsonProperty("group")
-        val group: Boolean,
-        @JsonProperty("group_id")
-        val groupId: Long?,
-        @JsonProperty("message_id")
-        val messageId: Int,
-        @JsonProperty("real_id")
-        val realId: Int,
-        @JsonProperty("message_type")
-        val messageType: PostMessageType,
-        @JsonProperty("sender")
-        val sender: Sender,
-        @JsonProperty("time")
-        val time: Int,
-        @JsonProperty("message")
-        val message: MessageDetail,
+        @JsonProperty("group") val group: Boolean,
+        @JsonProperty("group_id") val groupId: Long?,
+        @JsonProperty("message_id") val messageId: Int,
+        @JsonProperty("message_id_v2") val messageIdV2: String,
+        @JsonProperty("real_id") val realId: Int,
+        @JsonProperty("message_type") val messageType: PostMessageType,
+        @JsonProperty("sender") val sender: Sender,
+        @JsonProperty("time") val time: Int,
+        @JsonProperty("message") val message: MessageDetail,
         @JsonProperty("raw_message")
         val rawMessage: String?,
     ) {

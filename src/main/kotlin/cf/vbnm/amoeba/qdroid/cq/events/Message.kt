@@ -32,6 +32,7 @@ abstract class Message(
 
     suspend fun reply(bot: QBot, message: MessageDetail): MessageIdRet {
         log.info("Reply to {}: {}", this.userId, message)
+        if (message.getReply() == null) message.addReply(messageId)
         return when (messageType) {
             PostMessageType.PRIVATE -> {
                 val privateMessage = toPrivateMessage()

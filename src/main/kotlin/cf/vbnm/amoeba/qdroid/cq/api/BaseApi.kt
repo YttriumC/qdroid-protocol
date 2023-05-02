@@ -16,7 +16,7 @@ abstract class BaseApi<T>(
     @JsonProperty("echo")
     val echo: String? = null,
     @JsonProperty("data")
-    val data: T?
+    val data: T
 ) {
 
     override fun toString(): String {

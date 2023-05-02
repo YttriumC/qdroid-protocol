@@ -75,11 +75,11 @@ interface SendApi {
         throw IllegalStateException("Unknown Exception")
     }
 
-    suspend fun getMsg(messageId: Long): GetMsg
+    suspend fun getMsg(messageId: Int): GetMsg
 
-    suspend fun deleteMsg(messageId: Long): NoData
+    suspend fun deleteMsg(messageId: Int): NoData
 
-    suspend fun markMsgAsRead(messageId: Long): NoData
+    suspend fun markMsgAsRead(messageId: Int): NoData
 
     suspend fun getForwardMsg(forwardMessageId: String): GetForwardMsg
 

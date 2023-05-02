@@ -194,15 +194,15 @@ class QBot(
         )
     }
 
-    override suspend fun getMsg(messageId: Long): GetMsg {
+    override suspend fun getMsg(messageId: Int): GetMsg {
         return send(webSocketSession, Action.GET_MSG, Pair("message_id", messageId))
     }
 
-    override suspend fun deleteMsg(messageId: Long): NoData {
+    override suspend fun deleteMsg(messageId: Int): NoData {
         return send(webSocketSession, Action.DELETE_MSG, Pair("message_id", messageId))
     }
 
-    override suspend fun markMsgAsRead(messageId: Long): NoData {
+    override suspend fun markMsgAsRead(messageId: Int): NoData {
         return send(webSocketSession, Action.MARK_MSG_AS_READ, Pair("message_id", messageId))
     }
 

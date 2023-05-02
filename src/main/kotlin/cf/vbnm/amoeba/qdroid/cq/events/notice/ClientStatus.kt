@@ -12,7 +12,7 @@ class ClientStatus(
     @JsonProperty("time")
     time: Int,
     @JsonProperty("client")
-    val clients: MutableList<Device>,
+    val client: Device,
     @JsonProperty("online")
     val online: Boolean,
 ) : Notice(selfId, time, PostNoticeType.CLIENT_STATUS) {
@@ -22,7 +22,7 @@ class ClientStatus(
     }
 
     override fun toString(): String {
-        return "ClientStatus(clients=$clients, online=$online, ${super.toString()}"
+        return "ClientStatus(client=$client, online=$online, ${super.toString()}"
     }
 
     data class Device(
