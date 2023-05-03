@@ -36,14 +36,7 @@ class GroupDecrease(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return GroupDecrease(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                map["sub_type"] as String,
-                (map["group_id"] as Number).toLong(),
-                (map["operator_id"] as Number).toLong(),
-                (map["user_id"] as Number).toLong(),
-            )
+            return objectMapper.convertValue(map, GroupDecrease::class.java)
         }
     }
 }

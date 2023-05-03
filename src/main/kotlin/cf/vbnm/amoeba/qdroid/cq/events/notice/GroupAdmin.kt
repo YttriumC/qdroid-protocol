@@ -29,13 +29,7 @@ class GroupAdmin(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return GroupAdmin(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                (map["group_id"] as Number).toLong(),
-                (map["user_id"] as Number).toLong(),
-                map["sub_type"] as String
-            )
+            return objectMapper.convertValue(map, GroupAdmin::class.java)
         }
     }
 }

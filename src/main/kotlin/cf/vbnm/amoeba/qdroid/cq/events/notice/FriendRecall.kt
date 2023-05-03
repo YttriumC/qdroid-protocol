@@ -26,12 +26,7 @@ class FriendRecall(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return FriendRecall(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                (map["user_id"] as Number).toLong(),
-                (map["message_id"] as Number).toLong(),
-            )
+            return objectMapper.convertValue(map, FriendRecall::class.java)
         }
     }
 }

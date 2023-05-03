@@ -43,13 +43,7 @@ class GroupUpload(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return GroupUpload(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                (map["group_id"] as Number).toLong(),
-                (map["user_id"] as Number).toLong(),
-                objectMapper.convertValue(map["file"], GroupFile::class.java),
-            )
+            return objectMapper.convertValue(map, GroupUpload::class.java)
         }
     }
 

@@ -35,7 +35,7 @@ abstract class BaseEventPlugin<T : BasePostEvent>(
     /**
      * 未调用表示执行完毕, 后续任务不再执行,调用后则表示未执行完, 将执行后续任务
      * */
-    fun nextFilter() {
+    fun nextPlugin() {
         abort.set(false)
     }
 

@@ -39,30 +39,7 @@ class GroupRequest(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return GroupRequest(
-                map["self_id"].let {
-                    if (it is String) {
-                        return@let it.toLong()
-                    }
-                    it as Long
-                },
-                map["time"] as Int,
-                map["sub_type"] as String,
-                (map["group_id"] as Number).toLong(),
-                (map["user_id"] as Number).toLong(),
-                map["comment"] as String,
-                map["flag"] as String
-            )
-            /*GroupRequest::class.constructors.first().let { kFunction ->
-                val arr = arrayOfNulls<Any>(kFunction.parameters.size)
-                val params = ArrayList<Any>()
-                kFunction.parameters.forEach {//方法参数
-                    val name = it.findAnnotations(JsonProperty::class).first().value
-                    val kClass = it.type.isSubtypeOf(KType)
-                    kClass.isFinal
-                }
-                return kFunction.call(*arr)
-            }*/
+            return objectMapper.convertValue(map, GroupRequest::class.java)
         }
     }
 }

@@ -28,13 +28,7 @@ class FriendRequest(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return FriendRequest(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                (map["user_id"] as Number).toLong(),
-                map["comment"] as String,
-                map["flag"] as String
-            )
+            return objectMapper.convertValue(map, FriendRequest::class.java)
         }
     }
 }

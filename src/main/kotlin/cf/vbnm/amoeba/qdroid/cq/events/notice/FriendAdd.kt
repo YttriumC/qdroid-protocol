@@ -24,11 +24,7 @@ class FriendAdd(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return FriendAdd(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                (map["user_id"] as Number).toLong(),
-            )
+            return objectMapper.convertValue(map, FriendAdd::class.java)
         }
     }
 }

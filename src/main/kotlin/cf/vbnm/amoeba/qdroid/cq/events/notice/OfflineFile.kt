@@ -39,12 +39,7 @@ class OfflineFile(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return OfflineFile(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                (map["user_id"] as Number).toLong(),
-                objectMapper.convertValue(map["file"], PersonalFile::class.java)
-            )
+            return objectMapper.convertValue(map, OfflineFile::class.java)
         }
     }
 }

@@ -30,14 +30,7 @@ class GroupCard(
 
     companion object {
         fun parseEvent(map: Map<String, Any?>, objectMapper: ObjectMapper): BasePostEvent {
-            return GroupCard(
-                (map["self_id"] as Number).toLong(),
-                map["time"] as Int,
-                (map["group_id"] as Number).toLong(),
-                (map["user_id"] as Number).toLong(),
-                map["card_new"] as String,
-                map["card_old"] as String,
-            )
+            return objectMapper.convertValue(map, GroupCard::class.java)
         }
     }
 }
