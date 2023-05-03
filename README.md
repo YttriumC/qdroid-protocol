@@ -46,3 +46,15 @@
 ## 特别鸣谢 (Special Thanks)
 
 [IntelliJ IDEA](https://www.jetbrains.com/idea/)
+
+## 单独运行
+
+运行`distribution`中的 `installDist`, 进入`build/install/qdroid/bin`, 启动启动脚本即可
+
+启动脚本例:
+
+```bash
+qdroid.bat cf.vbnm.amoeba.AmoebaKt
+```
+
+其中参数是主方法所在类
