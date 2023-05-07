@@ -78,6 +78,11 @@ class MsgPartialType<T : BaseMsgPartial<*>> private constructor(
         return baseMsgPartial as T
     }
 
+    fun <R> toType(baseMsgPartial: BaseMsgPartial<*>, invoke: (T) -> R): R {
+        @Suppress("UNCHECKED_CAST")
+        return invoke(baseMsgPartial as T)
+    }
+
     fun toTypeOrNull(baseMsgPartial: BaseMsgPartial<*>?): T? {
         if (baseMsgPartial == null) {
             return null

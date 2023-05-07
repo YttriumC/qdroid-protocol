@@ -1,4 +1,4 @@
-package cf.vbnm.amoeba.qdroid.bot.plugin.event
+package cf.vbnm.amoeba.qdroid.bot.plugin.event.msgcmd
 
 import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.QBot
@@ -22,7 +22,7 @@ private val log = Slf4kt.getLogger(ChatGPTPlugin::class.java)
 class ChatGPTPlugin(
     private val chatGPT: ChatGPTClient,
     private val objectMapper: ObjectMapper
-) : MessageCommand() {
+) : BaseMessageCommand() {
     override fun getPrefixes(): Array<String> = arrayOf("/ask", "ask")
 
     override fun getPluginName(): String = "chatGPT"

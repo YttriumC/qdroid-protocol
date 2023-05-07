@@ -1,4 +1,4 @@
-package cf.vbnm.amoeba.qdroid.bot.plugin.event
+package cf.vbnm.amoeba.qdroid.bot.plugin.event.msgcmd
 
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
@@ -7,7 +7,7 @@ import com.google.common.base.Splitter
 import org.springframework.stereotype.Component
 
 @Component
-class SetPropertyPlugin : MessageCommand() {
+class SetPropertyPlugin : BaseMessageCommand() {
     override fun getPrefixes() = arrayOf("/set")
 
     override suspend fun handle(bot: QBot, msg: Message) {
@@ -17,7 +17,7 @@ class SetPropertyPlugin : MessageCommand() {
                 addText("使用格式: \r\n/set 属性名 属性值")
             })
         }
-        propertyService.set(splits[1], splits[2]).let {
+        propertyService.set(splits[1], removePrefix(msg.message.getText()).removePrefix(splits[1]).trimStart()).let {
             if (it == null) {
                 msg.reply(bot, MessageDetail.oneText("保存失败"))
             } else

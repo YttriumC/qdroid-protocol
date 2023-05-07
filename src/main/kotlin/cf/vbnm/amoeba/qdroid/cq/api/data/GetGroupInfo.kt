@@ -36,7 +36,7 @@ class GetGroupInfo(
          * 群备注
          * */
         @JsonProperty("group_memo")
-        val groupMemo: String,
+        val groupMemo: String?,
         @JsonProperty("group_create_time")
         val groupCreateTime: Int,
         @JsonProperty("group_level")

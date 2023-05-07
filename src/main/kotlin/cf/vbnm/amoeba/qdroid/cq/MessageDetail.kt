@@ -148,6 +148,43 @@ class MessageDetail(capacity: Int) : ArrayList<BaseMsgPartial<*>>(capacity) {
             toString()
         }
     }
+
+    override fun toString(): String {
+        return StringBuilder().also {
+            this.forEach { part ->
+                it.append(
+                    when (part.type) {
+                        MsgPartialType.TEXT -> {
+                            MsgPartialType.TEXT.toType(part).data.text
+                        }
+
+                        MsgPartialType.IMAGE -> {
+                            "{image: ${MsgPartialType.IMAGE.toType(part).data.url ?: MsgPartialType.IMAGE.toType(part).data.file}}"
+                        }
+
+                        MsgPartialType.VIDEO -> {
+                            "{video: ${MsgPartialType.VIDEO.toType(part).data.file}}"
+                        }
+
+                        MsgPartialType.AT -> {
+                            "{at: ${MsgPartialType.AT.toType(part).data.qq}}"
+                        }
+
+                        MsgPartialType.FACE -> {
+                            "{face: ${MsgPartialType.FACE.toType(part).data.id}}"
+                        }
+
+                        MsgPartialType.REPLY -> {
+                            "{reply: ${MsgPartialType.REPLY.toType(part).data.id}}"
+                        }
+
+                        else -> ""
+                    }
+                )
+            }
+        }.toString()
+    }
+
 }
 
 

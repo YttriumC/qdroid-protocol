@@ -3,7 +3,7 @@ package cf.vbnm.amoeba.qdroid
 import cf.vbnm.amoeba.Amoeba
 import cf.vbnm.amoeba.core.CoreProperty
 import cf.vbnm.amoeba.core.spi.Starter
-import cf.vbnm.amoeba.qdroid.bot.plugin.event.ChatGPTPlugin
+import cf.vbnm.amoeba.qdroid.bot.plugin.event.msgcmd.ChatGPTPlugin
 import cf.vbnm.amoeba.qdroid.config.JpaTest
 import cf.vbnm.amoeba.qdroid.config.WebSocketConfig
 import cf.vbnm.chatgpt.EnableChatGPTClient

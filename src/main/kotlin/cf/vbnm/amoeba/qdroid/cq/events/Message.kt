@@ -32,10 +32,10 @@ abstract class Message(
 
     suspend fun reply(bot: QBot, message: MessageDetail): MessageIdRet {
         log.info("Reply to {}: {}", this.userId, message)
-        if (message.getReply() == null) message.addReply(messageId)
         return when (messageType) {
             PostMessageType.PRIVATE -> {
                 val privateMessage = toPrivateMessage()
+                if (message.getReply() == null && privateMessage.tempSource == null) message.addReply(messageId)
                 privateMessage.tempSource?.let {
                     bot.sendPrivateMsg(userId, privateMessage.sender.groupId, message)
                 } ?: bot.sendPrivateMsg(userId, message = message)
@@ -43,6 +43,7 @@ abstract class Message(
 
             PostMessageType.GROUP -> {
                 val groupMessage = toGroupMessage()
+                if (message.getReply() == null) message.addReply(messageId)
                 bot.sendGroupMsg(groupMessage.groupId, message)
             }
         }
@@ -50,6 +51,20 @@ abstract class Message(
 
     open fun toGroupMessage(): GroupMessage {
         throw TypeCastException("Cannot cast message $messageType to GroupMessage")
+    }
+
+    open suspend fun <R> ifGroupMessage(invoke: suspend (GroupMessage) -> R): R? {
+        if (isGroupMessage()) {
+            return invoke(toGroupMessage())
+        }
+        return null
+    }
+
+    open suspend fun <R> ifPrivateMessage(invoke: suspend (PrivateMessage) -> R): R? {
+        if (isPrivateMessage()) {
+            return invoke(toPrivateMessage())
+        }
+        return null
     }
 
     fun isGroupMessage(): Boolean {

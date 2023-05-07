@@ -13,8 +13,8 @@ class GroupSignInPlugin(coreProperty: CoreProperty) : BaseScheduledPlugin(
 ) {
     override suspend fun apply(bot: QBot) {
         val groupList = bot.getGroupList()
-        groupList.data?.forEach {
-            log.info("在{}群组中签到完成", it.groupId)
+        groupList.data.forEach {
+            log.info("在{{}:{}}群组中签到完成", it.groupId, it.groupName)
             bot.sendGroupSign(it.groupId)
         }
 

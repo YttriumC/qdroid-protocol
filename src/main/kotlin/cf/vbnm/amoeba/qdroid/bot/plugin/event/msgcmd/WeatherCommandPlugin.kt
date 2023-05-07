@@ -1,4 +1,4 @@
-package cf.vbnm.amoeba.qdroid.bot.plugin.event
+package cf.vbnm.amoeba.qdroid.bot.plugin.event.msgcmd
 
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.bot.plugin.PluginOrder
@@ -16,7 +16,7 @@ import org.springframework.web.client.getForObject
 @Component
 class WeatherCommandPlugin(
     private val restTemplate: RestTemplate
-) : MessageCommand() {
+) : BaseMessageCommand() {
     override fun getPrefixes() = arrayOf("天气", "/天气")
     override fun getPluginName(): String = "weather"
     override suspend fun handle(bot: QBot, msg: Message) {

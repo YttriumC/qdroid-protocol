@@ -38,9 +38,8 @@ class QBot(
     }
 
     fun handleApi(map: Map<String, Any?>) {
-        log.info("handle api: {}", map)
+        log.debug("handle api: {}", map)
         map["echo"]?.toString()?.split(':')?.get(1)?.let { seq ->
-//            CleanBotWaitList.addTimeoutTrigger(scheduler, this, it.toInt(), waitMap)
             resumeQueue.remove(seq.toInt())?.let {
                 try {
                     val baseApi = objectMapper.convertValue(map, it.first)

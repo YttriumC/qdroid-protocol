@@ -45,7 +45,7 @@ class EventPluginManager(
                                     return@launch
                                 }
                             } catch (e: ClassCastException) {
-                                log.warn("Wrong target event: event type mismatch")
+                                log.error("Wrong target event: event type mismatch")
                             } catch (e: Exception) {
                                 log.warn("Plugin occurred an exception: ", e)
                             }

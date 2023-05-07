@@ -1,4 +1,4 @@
-package cf.vbnm.amoeba.qdroid.bot.plugin.event
+package cf.vbnm.amoeba.qdroid.bot.plugin.event.msgcmd
 
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
@@ -7,7 +7,7 @@ import com.google.common.base.Splitter
 import org.springframework.stereotype.Component
 
 @Component
-class DeletePropertyPlugin : MessageCommand() {
+class DeletePropertyPlugin : BaseMessageCommand() {
     override fun getPrefixes() = arrayOf("/delete")
 
     override suspend fun handle(bot: QBot, msg: Message) {
