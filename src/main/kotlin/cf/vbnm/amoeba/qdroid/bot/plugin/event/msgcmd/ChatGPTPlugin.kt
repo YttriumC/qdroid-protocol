@@ -44,8 +44,16 @@ class ChatGPTPlugin(
             }
         }
         val replies = getReplies(bot, msg.messageId)
+        replies.add(
+            0,
+            ChatMessage.ofSystem(
+                "You are qdroid, a large language model offered by https://github.com/Lu7fer . " +
+                        "Follow the user's instructions carefully. Respond using markdown."
+            )
+        )
         log.info("查询GPT: {}", replies)
         val chatCompletion = ChatCompletion().chatMessages(replies)
+        chatCompletion.topP(1.0).temperature(0.8)
         chatGPT.streamChatCompletion(chatCompletion, listener)
     }
 
@@ -54,7 +62,7 @@ class ChatGPTPlugin(
         GPTKeySupplier.plugin = this
     }
 
-    private suspend fun getReplies(bot: QBot, startMsgId: Int): List<ChatMessage> {
+    private suspend fun getReplies(bot: QBot, startMsgId: Int): ArrayList<ChatMessage> {
         val maxWords = 2048
         val me = bot.selfId
         var msgDetail = bot.getMsg(startMsgId)

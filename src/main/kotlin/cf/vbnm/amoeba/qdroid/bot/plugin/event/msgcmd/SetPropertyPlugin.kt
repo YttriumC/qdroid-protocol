@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class SetPropertyPlugin : BaseMessageCommand() {
-    override fun getPrefixes() = arrayOf("/set")
+    override fun getPrefixes() = arrayOf("/set", "set")
 
     override suspend fun handle(bot: QBot, msg: Message) {
         val splits = Splitter.on(' ').omitEmptyStrings().limit(3).splitToList(msg.message.getText())
