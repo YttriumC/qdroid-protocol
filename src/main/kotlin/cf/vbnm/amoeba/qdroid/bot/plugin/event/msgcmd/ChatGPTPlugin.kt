@@ -23,9 +23,17 @@ class ChatGPTPlugin(
     private val chatGPT: ChatGPTClient,
     private val objectMapper: ObjectMapper
 ) : BaseMessageCommand() {
+    private var contentSuffix = "\n  ——AIGC powered by qdroid"
     override fun getPrefixes(): Array<String> = arrayOf("/ask", "ask")
 
     override fun getPluginName(): String = "chatGPT"
+
+    @PostConstruct
+    fun init() {
+        this["suffix"]?.let {
+            contentSuffix = it
+        }
+    }
 
     override suspend fun handle(bot: QBot, msg: Message) {
         val listener = object : StreamListener(objectMapper) {
@@ -35,11 +43,19 @@ class ChatGPTPlugin(
 
             override fun onComplete(message: String) {
                 println()
-                val reply = MessageDetail.oneText(message.replace("\r\n", "\n").replace('\r', '\n'))
-                    .addReply(msg.messageId)
                 @OptIn(DelicateCoroutinesApi::class)
                 GlobalScope.launch {
-                    msg.reply(bot, reply)
+                    if (message.length > 3301) {
+                        (message + contentSuffix).chunkedSequence(3413).forEach {
+                            msg.reply(bot, MessageDetail.oneText(it))
+                        }
+                    } else {
+                        val reply = MessageDetail.oneText(
+                            message.replace("\r\n", "\n")
+                                .replace('\r', '\n') + contentSuffix
+                        )
+                        msg.reply(bot, reply)
+                    }
                 }
             }
         }
@@ -53,7 +69,7 @@ class ChatGPTPlugin(
         )
         log.info("查询GPT: {}", replies)
         val chatCompletion = ChatCompletion().chatMessages(replies)
-        chatCompletion.topP(1.0).temperature(0.8)
+        chatCompletion.temperature(1.0)
         chatGPT.streamChatCompletion(chatCompletion, listener)
     }
 
@@ -70,7 +86,7 @@ class ChatGPTPlugin(
         var words = 0
         while (true) {
             val message = if (msgDetail.data.sender.userId == me) {
-                ChatMessage.ofAssistant(msgDetail.data.message.getText().trim())
+                ChatMessage.ofAssistant(msgDetail.data.message.getText().trim().removeSuffix(contentSuffix).trim())
             } else {
                 ChatMessage.ofUser(removePrefix(msgDetail.data.message.getText().trim()).trim())
             }

@@ -47,7 +47,10 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.9.0"
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
             "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion")
-    implementation "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
+    implementation("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion") {
+        exclude group: 'org.jboss.logging'
+        exclude group: 'org.jboss'
+    }
     implementation "org.hibernate.orm:hibernate-core:$hibernateEntitymanagerVersion"
     implementation "org.glassfish:jakarta.el:$jakartaElVersion"
     implementation(
@@ -58,7 +61,6 @@ dependencies {
             "org.springframework:spring-aspects:$springVersion",
             "org.springframework:spring-context:$springVersion",
             "org.springframework:spring-websocket:$springVersion",
-//            "org.springframework:spring-messaging:$springVersion",
     )
     implementation "com.h2database:h2:$h2Version"
 //    implementation "org.yaml:snakeyaml:$snakeyamlVersion"
@@ -73,9 +75,11 @@ dependencies {
 
     compileOnly(project(':amoeba_core'))
     runtimeOnly(fileTree(dir: 'libs', includes: ['*.jar']))
-    implementation "org.quartz-scheduler:quartz:$quartzVersion"
+    implementation("org.quartz-scheduler:quartz:$quartzVersion") {
+        exclude group: 'com.mchange'
+    }
     implementation "com.google.guava:guava:$guavaVersion"
-    implementation "cf.vbnm.chatgpt:ChatGPT4Java:1.1.6-jre17-SNAPSHOT"
+    implementation "cf.vbnm.chatgpt:ChatGPT4Java:1.1.7-jre17-SNAPSHOT"
 }
 
 
