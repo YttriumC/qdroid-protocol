@@ -45,15 +45,24 @@ class ChatGPTPlugin(
                 println()
                 @OptIn(DelicateCoroutinesApi::class)
                 GlobalScope.launch {
-                    if (message.length > 3301) {
-                        (message + contentSuffix).chunkedSequence(3413).forEach {
-                            msg.reply(bot, MessageDetail.oneText(it))
+                    if (message.length > 3413) {
+                        (message + contentSuffix).chunkedSequence(3301).forEach {
+                            val reply = MessageDetail.oneText(it)
+                            if (removePrefix(msg.message.getText()).trim()
+                                    .isEmpty() && msg.message.getReply() != null
+                            ) {
+                                msg.message.getReply()?.data?.id?.let { id -> reply.addReply(id) }
+                            }
+                            msg.reply(bot, reply)
                         }
                     } else {
                         val reply = MessageDetail.oneText(
                             message.replace("\r\n", "\n")
                                 .replace('\r', '\n') + contentSuffix
                         )
+                        if (removePrefix(msg.message.getText()).trim().isEmpty() && msg.message.getReply() != null) {
+                            msg.message.getReply()?.data?.id?.let { id -> reply.addReply(id) }
+                        }
                         msg.reply(bot, reply)
                     }
                 }
@@ -84,27 +93,29 @@ class ChatGPTPlugin(
         var msgDetail = bot.getMsg(startMsgId)
         val msgList = ArrayList<ChatMessage>()
         var words = 0
-        while (true) {
+        var dive = 0
+        val maxDive = 16
+        while (dive++ < maxDive) {
             val message = if (msgDetail.data.sender.userId == me) {
-                ChatMessage.ofAssistant(msgDetail.data.message.getText().trim().removeSuffix(contentSuffix).trim())
+                ChatMessage.ofAssistant(
+                    msgDetail.data.message.getText().trim().removeSuffix(contentSuffix.trim()).trim()
+                )
             } else {
                 ChatMessage.ofUser(removePrefix(msgDetail.data.message.getText().trim()).trim())
             }
-            if (message.content.isBlank()) {
-                continue
-            }
-            if ((words + message.content.length) > maxWords && msgList.size > 0) {
-                break
-            } else {
-                words += message.content.length
-            }
-            msgList.add(0, message)
             val reply = msgDetail.data.message.getReply()
+            if (message.content.isNotBlank()) {
+                if ((words + message.content.length) > maxWords && msgList.size > 0) {
+                    break
+                } else {
+                    words += message.content.length
+                }
+                msgList.add(0, message)
+            }
             if (reply == null) {
                 break
-            } else {
-                msgDetail = bot.getMsg(reply.data.id)
             }
+            msgDetail = bot.getMsg(reply.data.id)
         }
         return msgList
     }
