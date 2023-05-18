@@ -28,4 +28,19 @@ abstract class AbstractPlugin {
     fun deleteProperty(name: String) {
         propertyService.delete("plugin.${getPluginName()}.${name.trim().removePrefix(".")}")
     }
+
+    fun isAdmin(id: Long): Boolean {
+        return id.toString() == propertyService[ADMIN_ACCOUNT_KEY]
+    }
+
+    fun <R> doIfAdmin(id: Long, invoke: () -> R): R? {
+        if (isAdmin(id)) {
+            return invoke()
+        }
+        return null
+    }
+
+    companion object {
+        const val ADMIN_ACCOUNT_KEY = "plugin.auth.admin.id"
+    }
 }

@@ -2,6 +2,7 @@ package cf.vbnm.amoeba.qdroid.bot.plugin.event.msgcmd
 
 import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.QBot
+import cf.vbnm.amoeba.qdroid.bot.plugin.AbstractPlugin
 import cf.vbnm.amoeba.qdroid.bot.plugin.event.PluginMessageFilter
 import cf.vbnm.amoeba.qdroid.cq.events.Message
 import cf.vbnm.amoeba.web.service.PropertyService
@@ -56,12 +57,23 @@ abstract class BaseMessageCommand {
     fun removePrefix(str: String): String {
         var s = str.trimStart()
         getPrefixes().forEach {
-            val res = s.removePrefix("$it ")
+            val res = s.removePrefix(it)
             if (res.length == s.length) {
                 s = res
             } else
-                return res
+                return res.trimStart()
         }
         return s.trimStart()
+    }
+
+    fun isAdmin(id: Long): Boolean {
+        return id.toString() == propertyService[AbstractPlugin.ADMIN_ACCOUNT_KEY]
+    }
+
+    suspend fun <R> doIfAdmin(id: Long, invoke: suspend () -> R): R? {
+        if (isAdmin(id)) {
+            return invoke()
+        }
+        return null
     }
 }

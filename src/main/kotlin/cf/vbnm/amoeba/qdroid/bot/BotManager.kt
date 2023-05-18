@@ -32,7 +32,7 @@ class BotManager(
             }
             this[postEvent.selfId]?.handleEvent(postEvent)
         } else {
-            get((map["echo"] as String).split(':')[0].toLong())?.let {
+            get((map["echo"].toString()).split(':')[0].toLong())?.let {
                 it.setWebSocketSession(session)
                 it.handleApi(map)
             } ?: log.info("Non-mapped message: {}", map)
