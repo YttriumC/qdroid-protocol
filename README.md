@@ -45,7 +45,7 @@
 
 ## 特别鸣谢 (Special Thanks)
 
-[IntelliJ IDEA](https://www.jetbrains.com/idea/)
+[![JetBrains](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://www.jetbrains.com/idea/)
 
 ## 单独运行
 
