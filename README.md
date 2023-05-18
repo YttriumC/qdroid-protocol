@@ -7,7 +7,7 @@
 
 目前仅支持在IDE中运行, 后续将添加jar扫描功能, 如需打包, 请添加依赖路径到classpath
 
-将Amoeba_core打出来的jar放到qdroid/libs文件夹中
+将amoeba_core打出来的jar放到qdroid/libs文件夹中
 
 ## 目录结构 (Directory Structure)
 
@@ -41,6 +41,8 @@
   - ask 对话内容
   - /ask 对话内容
 - 自动加好友
+- bot管理员认证
+- 撤回消息指令
 - 其它功能敬请期待
 
 ## 特别鸣谢 (Special Thanks)

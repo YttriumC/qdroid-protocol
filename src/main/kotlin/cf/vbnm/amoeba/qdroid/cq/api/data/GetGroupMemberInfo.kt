@@ -26,6 +26,7 @@ class GetGroupMemberInfo(
             return objectMapper.convertValue(map, GetGroupMemberInfo::class.java)
         }
     }
+
     data class GroupMemberInfo(
         @JsonProperty("group_id")
         val groupId: Long,
@@ -47,6 +48,12 @@ class GetGroupMemberInfo(
         val lastSentTime: Int,
         @JsonProperty("level")
         val level: String,
+        @JsonProperty("role")
+        val role: String,
+        @JsonProperty("unfriendly")
+        val unfriendly: String,
+        @JsonProperty("title")
+        val title: String,
         @JsonProperty("title_expire_time")
         val titleExpireTime: Long,
         @JsonProperty("card_changeable")

@@ -79,7 +79,11 @@ class ChatGPTPlugin(
         log.info("查询GPT: {}", replies)
         val chatCompletion = ChatCompletion().chatMessages(replies)
         chatCompletion.temperature(1.0)
-        chatGPT.streamChatCompletion(chatCompletion, listener)
+        try {
+            chatGPT.streamChatCompletion(chatCompletion, listener)
+        } catch (e: Exception) {
+            msg.reply(bot, MessageDetail.oneText("出错了, 请重新发送一下吧: ${e.message}, "))
+        }
     }
 
     @PostConstruct

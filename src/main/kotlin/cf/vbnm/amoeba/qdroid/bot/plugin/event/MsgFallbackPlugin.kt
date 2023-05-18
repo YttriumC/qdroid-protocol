@@ -19,10 +19,10 @@ class MsgFallbackPlugin(
     }
 
     override suspend fun apply(bot: QBot, event: Message) {
-        event.ifPrivateMessage {
+        event.doIfPrivateMessage {
             event.reply(bot, MessageDetail.oneText("我是qdroid, 可以使用 menu /menu 或 菜单 查看支持的功能"))
         }
-        event.ifGroupMessage {
+        event.doIfGroupMessage {
             if (it.message.isAt(bot.selfId)) {
                 event.reply(bot, MessageDetail.oneText("我是qdroid, 可以使用 menu /menu 或 菜单 查看支持的功能"))
             }

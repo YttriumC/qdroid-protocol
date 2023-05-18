@@ -53,14 +53,14 @@ abstract class Message(
         throw TypeCastException("Cannot cast message $messageType to GroupMessage")
     }
 
-    open suspend fun <R> ifGroupMessage(invoke: suspend (GroupMessage) -> R): R? {
+    open suspend fun <R> doIfGroupMessage(invoke: suspend (GroupMessage) -> R): R? {
         if (isGroupMessage()) {
             return invoke(toGroupMessage())
         }
         return null
     }
 
-    open suspend fun <R> ifPrivateMessage(invoke: suspend (PrivateMessage) -> R): R? {
+    open suspend fun <R> doIfPrivateMessage(invoke: suspend (PrivateMessage) -> R): R? {
         if (isPrivateMessage()) {
             return invoke(toPrivateMessage())
         }

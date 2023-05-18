@@ -20,10 +20,10 @@ class LogAllMessageEventPlugin(
     override fun getTypeParameterClass() = Message::class
 
     override suspend fun apply(bot: QBot, event: Message) {
-        event.ifPrivateMessage {
+        event.doIfPrivateMessage {
             log.info("Message: From:{} :{}", it.sender.nickname, it.message.toString())
         }
-        event.ifGroupMessage {
+        event.doIfGroupMessage {
 
             log.info(
                 "Message: Group:{}, from:{} :{}",

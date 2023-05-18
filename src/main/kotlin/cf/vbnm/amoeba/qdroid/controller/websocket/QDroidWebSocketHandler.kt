@@ -37,9 +37,7 @@ class QDroidWebSocketHandler(private val objectMapper: ObjectMapper, private val
                 object : TypeReference<Map<String, Any?>>() {}
             )
             if (BasePostEvent.isPostEvent(map)) {
-                val event = BasePostEvent.parseEvent(map, objectMapper)
-                if (!event.isMetaEvent())
-                    log.debug("Received event: {}", event)
+                log.debug("Received event: {}", map)
             }
             botManager.handleMessages(session, map)
         } catch (e: Exception) {

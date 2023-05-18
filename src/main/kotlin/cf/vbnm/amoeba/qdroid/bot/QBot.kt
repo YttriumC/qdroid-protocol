@@ -32,6 +32,10 @@ class QBot(
         else if (this.webSocketSession !== wsSession) this.webSocketSession = wsSession
     }
 
+    fun getWebSocketSession(): WebSocketSession {
+        return webSocketSession
+    }
+
     fun handleEvent(event: BasePostEvent) {
         log.info("Handle Event: {}", event.javaClass)
         eventPluginManager.handleEvent(event, this)
@@ -56,7 +60,6 @@ class QBot(
         return "$selfId:${seq}"
     }
 
-    @Synchronized
     private fun newSeq(): Int {
         return seq.incrementAndGet()
     }
