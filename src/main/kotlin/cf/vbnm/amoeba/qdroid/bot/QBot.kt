@@ -2,6 +2,7 @@ package cf.vbnm.amoeba.qdroid.bot
 
 import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.plugin.EventPluginManager
+import cf.vbnm.amoeba.qdroid.bot.statistics.Statistics
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.BaseApi
 import cf.vbnm.amoeba.qdroid.cq.api.data.*
@@ -26,6 +27,7 @@ class QBot(
     private lateinit var webSocketSession: WebSocketSession
     private val resumeQueue = ConcurrentHashMap<Int, Pair<Class<BaseApi<*>>, CancellableContinuation<BaseApi<*>>>>()
     private val seq = AtomicInteger(0)
+    val statistics = Statistics()
 
     fun setWebSocketSession(wsSession: WebSocketSession) {
         if (!this::webSocketSession.isInitialized) this.webSocketSession = wsSession
@@ -38,6 +40,7 @@ class QBot(
 
     fun handleEvent(event: BasePostEvent) {
         log.info("Handle Event: {}", event.javaClass)
+        statistics.addReceivedEvent(event)
         eventPluginManager.handleEvent(event, this)
     }
 
@@ -47,8 +50,10 @@ class QBot(
             resumeQueue.remove(seq.toInt())?.let {
                 try {
                     val baseApi = objectMapper.convertValue(map, it.first)
+                    statistics.addSuccessApi()
                     it.second.resumeWith(Result.success(baseApi))
                 } catch (e: Exception) {
+                    statistics.addFailedApi()
                     it.second.resumeWith(Result.failure(e))
                 }
 
@@ -95,6 +100,7 @@ class QBot(
                     @Suppress("UNCHECKED_CAST")
                     resumeQueue[seq] =
                         Pair(R::class.java as Class<BaseApi<*>>, it as CancellableContinuation<BaseApi<*>>)
+                    statistics.addSentApi()
                     wsSession.sendMessage(TextMessage(s))
                 }
             }

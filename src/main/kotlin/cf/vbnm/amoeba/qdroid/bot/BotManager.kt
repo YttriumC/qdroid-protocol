@@ -2,6 +2,7 @@ package cf.vbnm.amoeba.qdroid.bot
 
 import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.plugin.EventPluginManager
+import cf.vbnm.amoeba.qdroid.bot.statistics.Statistics
 import cf.vbnm.amoeba.qdroid.cq.events.BasePostEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Component
@@ -21,12 +22,12 @@ class BotManager(
             val postEvent = BasePostEvent.parseEvent(map, objectMapper)
             if (postEvent.isMetaEvent()) {
                 val metaEvent = postEvent.toMetaEvent()
-                val lifecycle = metaEvent.takeIf { it.isLifecycle() }?.toLifecycle() ?: return
-                var qBot = get(lifecycle.selfId)
+                var qBot = get(metaEvent.selfId)
                 if (qBot == null) {
-                    qBot = QBot(lifecycle.selfId, objectMapper, eventPluginManager)
+                    qBot = QBot(metaEvent.selfId, objectMapper, eventPluginManager)
                 }
-                put(lifecycle.selfId, qBot)
+                put(metaEvent.selfId, qBot)
+                qBot.statistics.addReceivedMetaEvent()
                 qBot.setWebSocketSession(session)
                 return
             }
@@ -35,7 +36,10 @@ class BotManager(
             get((map["echo"].toString()).split(':')[0].toLong())?.let {
                 it.setWebSocketSession(session)
                 it.handleApi(map)
-            } ?: log.info("Non-mapped message: {}", map)
+            } ?: let {
+                log.info("Non-mapped message: {}", map)
+                Statistics.global.addDroppedApi()
+            }
         }
     }
 }

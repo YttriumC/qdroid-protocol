@@ -76,4 +76,24 @@ abstract class BaseMessageCommand {
         }
         return null
     }
+
+    fun isPluginEnabled(): Boolean {
+        this["enable"]?.let {
+            return when (it) {
+                "true", "1", "y", "yes", "enable", "enabled" -> true
+                else -> {
+                    false
+                }
+            }
+        }
+        return false
+    }
+
+    fun enablePlugin() {
+        this["enable"] = "true"
+    }
+
+    fun disablePlugin() {
+        this["enable"] = "false"
+    }
 }

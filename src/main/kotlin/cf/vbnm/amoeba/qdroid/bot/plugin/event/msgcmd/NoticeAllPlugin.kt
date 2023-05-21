@@ -12,7 +12,7 @@ class NoticeAllPlugin : BaseMessageCommand() {
     override suspend fun handle(bot: QBot, msg: Message) {
         msg.doIfPrivateMessage {
             val notice = removePrefix(msg.message.getText())
-            if (msg.userId == (this["admin"]?.toLong() ?: "")) {
+            if (isAdmin(msg.userId)) {
                 bot.getFriendList().data.forEach {
                     bot.sendPrivateMsg(it.userId, message = MessageDetail.oneText(notice))
                 }

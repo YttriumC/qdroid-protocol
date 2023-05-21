@@ -16,7 +16,10 @@ class ImageGPTPlugin(private val chatGPT: ChatGPTClient) : BaseMessageCommand() 
     override fun getPluginName(): String = "chatGPT"
 
     override suspend fun handle(bot: QBot, msg: Message) {
-
+        if (!isPluginEnabled()) {
+            msg.reply(bot, MessageDetail.oneText("该插件已关闭"))
+            return
+        }
         val imageResp = chatGPT.generationImage(removePrefix(msg.message.getText()))
         imageResp.data.forEach {
             log.info("Generated image: {}", it.url)
