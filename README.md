@@ -15,10 +15,10 @@
 --root
   |-amoeba_core
   | |-src
+  | |-... 
   |-qdroid
-    |-libs
-    | |-amoeba-1.0-SNAPSHOT.jar
     |-src
+    |-...
 ```
 
 如果没有ChatGPT官方API额度, 可以尝试:
