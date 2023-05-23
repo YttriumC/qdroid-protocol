@@ -11,6 +11,10 @@ class SetPropertyPlugin : BaseMessageCommand() {
     override fun getPrefixes() = arrayOf("/set", "set")
 
     override suspend fun handle(bot: QBot, msg: Message) {
+        if (!isAdmin(msg.userId)) {
+            nextFilter()
+            return
+        }
         val splits = Splitter.on(' ').omitEmptyStrings().limit(3).splitToList(msg.message.getText())
         if (splits.size < 3) {
             msg.reply(bot, MessageDetail().apply {

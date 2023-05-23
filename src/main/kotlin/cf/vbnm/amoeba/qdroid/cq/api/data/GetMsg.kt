@@ -43,6 +43,15 @@ class GetMsg(
             PostMessageType.GROUP -> {
                 bot.sendGroupMsg(data.groupId!!, message)
             }
+
+            PostMessageType.GUILD -> MessageIdRet(
+                Status.FAILED,
+                Retcode.FAILED,
+                "频道消息不支持",
+                null,
+                null,
+                MessageIdRet.MessageId(0)
+            )
         }
     }
 

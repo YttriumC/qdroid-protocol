@@ -8,9 +8,13 @@ import org.springframework.stereotype.Component
 
 @Component
 class DeletePropertyPlugin : BaseMessageCommand() {
-    override fun getPrefixes() = arrayOf("/delete")
+    override fun getPrefixes() = arrayOf("/delete", "delete")
 
     override suspend fun handle(bot: QBot, msg: Message) {
+        if (!isAdmin(msg.userId)) {
+            nextFilter()
+            return
+        }
         val splits = Splitter.on(' ').omitEmptyStrings().splitToList(msg.message.getText())
         if (splits.size < 2) {
             msg.reply(bot, MessageDetail().apply {

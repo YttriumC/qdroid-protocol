@@ -2,7 +2,7 @@
 
 ## 简介 (Simple Description)
 
-这是一个 [Amoeba] 子项目, 基于[amoeba_core](https://github.com/Lu7fer/amoeba_core)开发,
+这是一个 [Amoeba] 子模块, 基于[amoeba_core](https://github.com/Lu7fer/amoeba_core)开发,
 通过Websocket连接了go-CQHTTP程序, 以使用Kotlin/Java进行开发.
 
 目前仅支持在IDE中运行, 后续将添加jar扫描功能, 如需打包, 请添加依赖路径到classpath
@@ -13,7 +13,7 @@
 
 ```
 --root
-  |-Amoeba_core
+  |-amoeba_core
   | |-src
   |-qdroid
     |-libs

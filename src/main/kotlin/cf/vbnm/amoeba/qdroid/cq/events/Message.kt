@@ -4,9 +4,13 @@ import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.data.MessageIdRet
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Retcode
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
+import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageSubType
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostType
 import cf.vbnm.amoeba.qdroid.cq.events.message.GroupMessage
+import cf.vbnm.amoeba.qdroid.cq.events.message.GuildMessage
 import cf.vbnm.amoeba.qdroid.cq.events.message.PrivateMessage
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -28,6 +32,8 @@ abstract class Message(
     val rawMessage: String,
     @JsonProperty("user_id")
     val userId: Long,
+    @JsonProperty("sub_type")
+    val subType: PostMessageSubType,
 ) : BasePostEvent(selfId, time, PostType.MESSAGE) {
 
     suspend fun reply(bot: QBot, message: MessageDetail): MessageIdRet {
@@ -46,6 +52,15 @@ abstract class Message(
                 if (message.getReply() == null) message.addReply(messageId)
                 bot.sendGroupMsg(groupMessage.groupId, message)
             }
+
+            PostMessageType.GUILD -> MessageIdRet(
+                Status.FAILED,
+                Retcode.FAILED,
+                "频道消息不支持",
+                null,
+                null,
+                MessageIdRet.MessageId(0)
+            )
         }
     }
 
@@ -67,6 +82,13 @@ abstract class Message(
         return null
     }
 
+    open suspend fun <R> doIfGuildMessage(invoke: suspend (GuildMessage) -> R): R? {
+        if (isGuildMessage()) {
+            return invoke(toGuildMessage())
+        }
+        return null
+    }
+
     fun isGroupMessage(): Boolean {
         return messageType == PostMessageType.GROUP
     }
@@ -75,8 +97,16 @@ abstract class Message(
         throw TypeCastException("Cannot cast message $messageType to PrivateMessage")
     }
 
+    open fun toGuildMessage(): GuildMessage {
+        throw TypeCastException("Cannot cast message $messageType to PrivateMessage")
+    }
+
     fun isPrivateMessage(): Boolean {
         return messageType == PostMessageType.PRIVATE
+    }
+
+    fun isGuildMessage(): Boolean {
+        return messageType == PostMessageType.GUILD
     }
 
     override fun toMessage(): Message {
@@ -98,6 +128,7 @@ abstract class Message(
             return when (PostMessageType.parseType(map["message_type"].toString())) {
                 PostMessageType.PRIVATE -> PrivateMessage.parseEvent(map, objectMapper)
                 PostMessageType.GROUP -> GroupMessage.parseEvent(map, objectMapper)
+                PostMessageType.GUILD -> GuildMessage.parseEvent(map, objectMapper)
             }
         }
     }

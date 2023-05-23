@@ -96,4 +96,16 @@ abstract class BaseMessageCommand {
     fun disablePlugin() {
         this["enable"] = "false"
     }
+
+    fun String.rmPrefix(): String {
+        var s = this.trimStart()
+        getPrefixes().forEach {
+            val res = s.removePrefix(it)
+            if (res.length == s.length) {
+                s = res
+            } else
+                return res.trimStart()
+        }
+        return s.trimStart()
+    }
 }

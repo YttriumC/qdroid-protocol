@@ -15,7 +15,7 @@ class GroupMessage(
     @JsonProperty("time")
     time: Int,
     @JsonProperty("sub_type")
-    val subType: PostMessageSubType,
+    subType: PostMessageSubType,
     @JsonProperty("message_id")
     messageId: Int,
     @JsonProperty("user_id")
@@ -34,7 +34,7 @@ class GroupMessage(
     val groupId: Long,
     @JsonProperty("anonymous")
     val anonymous: Anonymous?,
-) : Message(selfId, time, messageId, PostMessageType.GROUP, message, rawMessage, userId) {
+) : Message(selfId, time, messageId, PostMessageType.GROUP, message, rawMessage, userId, subType) {
 
     override fun toGroupMessage(): GroupMessage {
         return this

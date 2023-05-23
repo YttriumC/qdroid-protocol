@@ -7,6 +7,7 @@ import cf.vbnm.amoeba.qdroid.bot.plugin.event.msgcmd.BaseMessageCommand
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.events.Message
 import com.google.common.base.Splitter
+import kotlinx.coroutines.*
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
@@ -36,6 +37,10 @@ class MessageCommandPlugin(
     }
 
     override suspend fun apply(bot: QBot, event: Message) {
+        @OptIn(DelicateCoroutinesApi::class)
+        GlobalScope.launch(currentCoroutineContext(), CoroutineStart.DEFAULT) {
+            bot.markMsgAsRead(event.messageId)
+        }
         val part = Splitter.on(' ').omitEmptyStrings().splitToList(event.message.getText().trimStart())
         if (part.size == 0) {
             nextPlugin()

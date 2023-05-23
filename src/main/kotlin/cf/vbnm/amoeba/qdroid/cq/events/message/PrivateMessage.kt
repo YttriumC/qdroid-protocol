@@ -15,7 +15,7 @@ class PrivateMessage(
     @JsonProperty("time")
     time: Int,
     @JsonProperty("sub_type")
-    val subType: PostMessageSubType,
+    subType: PostMessageSubType,
     @JsonProperty("message_id")
     messageId: Int,
     @JsonProperty("user_id")
@@ -30,7 +30,7 @@ class PrivateMessage(
     val sender: PrivateMsgSender,
     @JsonProperty("temp_source")
     val tempSource: PostMessageTempSourceType?,
-) : Message(selfId, time, messageId, PostMessageType.PRIVATE, message, rawMessage, userId) {
+) : Message(selfId, time, messageId, PostMessageType.PRIVATE, message, rawMessage, userId, subType) {
 
     override fun toPrivateMessage(): PrivateMessage {
         return this

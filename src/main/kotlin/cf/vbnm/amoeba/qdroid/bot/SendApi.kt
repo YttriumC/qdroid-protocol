@@ -2,6 +2,8 @@ package cf.vbnm.amoeba.qdroid.bot
 
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.data.*
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Retcode
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
 import cf.vbnm.amoeba.qdroid.cq.events.BasePostEvent
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
 
@@ -61,6 +63,14 @@ interface SendApi {
                 return when (it) {
                     PostMessageType.PRIVATE -> sendPrivateMsg(userId!!, groupId, message, autoEscape)
                     PostMessageType.GROUP -> sendGroupMsg(groupId!!, message, autoEscape)
+                    PostMessageType.GUILD -> MessageIdRet(
+                        Status.FAILED,
+                        Retcode.FAILED,
+                        "频道消息不支持",
+                        null,
+                        null,
+                        MessageIdRet.MessageId(0)
+                    )
                 }
             }
         } catch (e: NullPointerException) {
@@ -180,4 +190,6 @@ interface SendApi {
 //    suspend fun getWordSlices()
 
     suspend fun handleQuickOperation(context: BasePostEvent, operation: Any): NoData
+
+    suspend fun sendGuildChannelMsg(guildId: Long, channelId: Long, message: MessageDetail): StringMessageIdRet
 }

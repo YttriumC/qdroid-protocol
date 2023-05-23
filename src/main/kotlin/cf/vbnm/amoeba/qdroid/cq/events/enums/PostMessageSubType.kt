@@ -12,7 +12,8 @@ enum class PostMessageSubType(val type: String, val desc: String) {
     ANONYMOUS("anonymous", "匿名"),
     GROUP_SELF("group_self", "群中自身发送"),
     GROUP("group", "群临时会话"),
-    NOTICE("notice", "系统提示");
+    NOTICE("notice", "系统提示"),
+    CHANNEL("channel", "频道消息");
 
     override fun toString(): String {
         return type

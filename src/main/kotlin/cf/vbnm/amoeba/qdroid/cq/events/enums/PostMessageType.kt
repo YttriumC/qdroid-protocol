@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 @JsonDeserialize(using = PostMessageType.Deserializer::class)
 enum class PostMessageType(val type: String, val desc: String) {
     PRIVATE("private", "私聊消息"),
-    GROUP("group", "群消息");
+    GROUP("group", "群消息"),
+    GUILD("guild", "频道消息");
 
     override fun toString(): String {
         return type

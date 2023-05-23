@@ -24,10 +24,17 @@ class LogAllMessageEventPlugin(
             log.info("Message: From:{} :{}", it.sender.nickname, it.message.toString())
         }
         event.doIfGroupMessage {
-
             log.info(
                 "Message: Group:{}, from:{} :{}",
                 bot.getGroupInfo(it.groupId).data.groupName,
+                it.sender.nickname,
+                it.message.toString()
+            )
+        }
+        event.doIfGuildMessage {
+            log.info(
+                "Message: Guild:{}, from:{} :{}",
+                it.guildId,
                 it.sender.nickname,
                 it.message.toString()
             )

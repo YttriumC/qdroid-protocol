@@ -565,4 +565,17 @@ class QBot(
             Pair("operation", operation),
         )
     }
+
+    override suspend fun sendGuildChannelMsg(
+        guildId: Long,
+        channelId: Long,
+        message: MessageDetail
+    ): StringMessageIdRet {
+        return send(
+            webSocketSession, Action.SEND_GUILD_CHANNEL_MSG,
+            Pair("guild_id", guildId),
+            Pair("channel_id", channelId),
+            Pair("message", message)
+        )
+    }
 }

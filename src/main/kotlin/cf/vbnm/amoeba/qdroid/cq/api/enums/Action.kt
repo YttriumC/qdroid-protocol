@@ -85,6 +85,7 @@ class Action<T : BaseApi<*>> private constructor(
         val DELETE_FRIEND = Action("delete_friend", NoData::class.java, 64)
         val SET_GROUP_NAME = Action("set_group_name", NoData::class.java, 65)
         val HANDLE_QUICK_OPERATION = Action("_handle_quick_operation", NoData::class.java, 66)
+        val SEND_GUILD_CHANNEL_MSG = Action("send_guild_channel_msg", StringMessageIdRet::class.java, 66)
     }
 
     fun cast(baseApi: BaseApi<*>): T {
