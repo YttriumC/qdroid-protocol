@@ -74,7 +74,7 @@ dependencies {
     )
 
     compileOnly(project(':amoeba_core'))
-    runtimeOnly(fileTree(dir: 'libs', includes: ['*.jar']))
+    runtimeOnly(fileTree(dir: '../amoeba_core/build/libs', includes: ['*.jar']))
     implementation("org.quartz-scheduler:quartz:$quartzVersion") {
         exclude group: 'com.mchange'
     }
