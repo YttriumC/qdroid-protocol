@@ -24,19 +24,17 @@ class QBot(
     val selfId: Long, private val objectMapper: ObjectMapper, private val eventPluginManager: EventPluginManager
 ) : SendApi {
     @Volatile
-    private lateinit var webSocketSession: WebSocketSession
+    private lateinit var _webSocketSession: WebSocketSession
     private val resumeQueue = ConcurrentHashMap<Int, Pair<Class<BaseApi<*>>, CancellableContinuation<BaseApi<*>>>>()
     private val seq = AtomicInteger(0)
     val statistics = Statistics()
 
-    fun setWebSocketSession(wsSession: WebSocketSession) {
-        if (!this::webSocketSession.isInitialized) this.webSocketSession = wsSession
-        else if (this.webSocketSession !== wsSession) this.webSocketSession = wsSession
-    }
-
-    fun getWebSocketSession(): WebSocketSession {
-        return webSocketSession
-    }
+    var webSocketSession: WebSocketSession
+        get() = _webSocketSession
+        set(wsSession) {
+            if (!this::_webSocketSession.isInitialized) this._webSocketSession = wsSession
+            else if (this._webSocketSession !== wsSession) this._webSocketSession = wsSession
+        }
 
     fun handleEvent(event: BasePostEvent) {
         log.info("Handle Event: {}", event.javaClass)
@@ -69,7 +67,7 @@ class QBot(
         return seq.incrementAndGet()
     }
 
-    private suspend inline fun <reified R : BaseApi<*>, T : Action<R>> send(
+    private suspend inline fun <reified R : BaseApi<*>, T : Action<R, *>> send(
         wsSession: WebSocketSession, action: T, vararg params: Pair<String, Any?>
     ): R {
         val seq = newSeq()
@@ -82,24 +80,15 @@ class QBot(
         }
 
         // 防止在没有接收到返回值的情况下造成内存泄漏, 1分钟后将其移除
-        /*       TimeoutJob.addTimeoutJob(scheduler, 1, TimeUnit.MINUTES) {
-                   waitMap.remove(seq)
-                   log.info("Auto remove timeout trigger: {}", seq)
-               }.also {
-                   @Suppress("UNCHECKED_CAST")
-                   waitMap[seq] = Triple(
-                       R::class.java, it
-                   ) as Triple<Class<BaseApi<*>>, (BaseApi<*>) -> Unit, Pair<String, String>>
-               }*/
         val s = objectMapper.writeValueAsString(sendData)
         log.debug("Send Message: {}", s)
 
         try {
             val r = withTimeout(60000) {
                 suspendCancellableCoroutine<R> {
-                    @Suppress("UNCHECKED_CAST")
-                    resumeQueue[seq] =
-                        Pair(R::class.java as Class<BaseApi<*>>, it as CancellableContinuation<BaseApi<*>>)
+                    @Suppress("UNCHECKED_CAST") val continuation = it as CancellableContinuation<BaseApi<*>>
+                    @Suppress("UNCHECKED_CAST") val clazz = R::class.java as Class<BaseApi<*>>
+                    resumeQueue[seq] = Pair(clazz, continuation)
                     statistics.addSentApi()
                     wsSession.sendMessage(TextMessage(s))
                 }
@@ -111,7 +100,7 @@ class QBot(
     }
 
     class SendData(
-        action: Action<*>, params: Map<String, Any?>, val echo: String?
+        action: Action<*, *>, params: Map<String, Any?>, val echo: String?
     ) : HashMap<String, Any?>(3) {
         init {
             put("action", action)
@@ -121,7 +110,7 @@ class QBot(
     }
 
     override suspend fun getLoginInfo(): GetLoginInfo {
-        return send(webSocketSession, Action.GET_LOGIN_INFO)
+        return send(_webSocketSession, Action.GET_LOGIN_INFO)
     }
 
     override suspend fun setQqProfile(
@@ -131,45 +120,45 @@ class QBot(
         college: String,
         personalNote: String,
     ): NoData {
-        return send(webSocketSession, Action.SET_QQ_PROFILE)
+        return send(_webSocketSession, Action.SET_QQ_PROFILE)
     }
 
     override suspend fun qidianGetAccountInfo(): GetQidianInfo {
-        return send(webSocketSession, Action.GET_QIDIAN_ACCOUNT_INFO)
+        return send(_webSocketSession, Action.GET_QIDIAN_ACCOUNT_INFO)
     }
 
     override suspend fun getModelShow(model: String): GetModelShow {
-        return send(webSocketSession, Action.GET_MODEL_SHOW, Pair("model", model))
+        return send(_webSocketSession, Action.GET_MODEL_SHOW, Pair("model", model))
     }
 
     override suspend fun setModelShow(model: String, modelShow: String): NoData {
-        return send(webSocketSession, Action.SET_MODEL_SHOW, Pair("model", model), Pair("model_show", modelShow))
+        return send(_webSocketSession, Action.SET_MODEL_SHOW, Pair("model", model), Pair("model_show", modelShow))
     }
 
     override suspend fun getOnlineClients(noCache: Boolean): GetOnlineClients {
-        return send(webSocketSession, Action.GET_ONLINE_CLIENTS, Pair("no_cache", noCache))
+        return send(_webSocketSession, Action.GET_ONLINE_CLIENTS, Pair("no_cache", noCache))
     }
 
     override suspend fun getStrangerInfo(userId: Long, noCache: Boolean): GetStrangerInfo {
         return send(
-            webSocketSession, Action.GET_STRANGER_INFO, Pair("user_id", userId), Pair("no_cache", noCache)
+            _webSocketSession, Action.GET_STRANGER_INFO, Pair("user_id", userId), Pair("no_cache", noCache)
         )
     }
 
     override suspend fun getFriendList(): GetFriendList {
-        return send(webSocketSession, Action.GET_FRIEND_LIST)
+        return send(_webSocketSession, Action.GET_FRIEND_LIST)
     }
 
     override suspend fun getUnidirectionalFriendList(): GetUnidirectionalFriendList {
-        return send(webSocketSession, Action.GET_UNIDIRECTIONAL_FRIEND_LIST)
+        return send(_webSocketSession, Action.GET_UNIDIRECTIONAL_FRIEND_LIST)
     }
 
     override suspend fun deleteFriend(userId: Long): NoData {
-        return send(webSocketSession, Action.DELETE_FRIEND, Pair("user_id", userId))
+        return send(_webSocketSession, Action.DELETE_FRIEND, Pair("user_id", userId))
     }
 
     override suspend fun deleteUnidirectionalFriend(): NoData {
-        return send(webSocketSession, Action.DELETE_UNIDIRECTIONAL_FRIEND)
+        return send(_webSocketSession, Action.DELETE_UNIDIRECTIONAL_FRIEND)
     }
 
     override suspend fun sendPrivateMsg(
@@ -179,7 +168,7 @@ class QBot(
         autoEscape: Boolean,
     ): MessageIdRet {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SEND_PRIVATE_MSG,
             Pair("user_id", userId),
             Pair("group_id", groupId),
@@ -194,7 +183,7 @@ class QBot(
         autoEscape: Boolean,
     ): MessageIdRet {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SEND_GROUP_MSG,
             Pair("group_id", groupId),
             Pair("message", message),
@@ -203,37 +192,37 @@ class QBot(
     }
 
     override suspend fun getMsg(messageId: Int): GetMsg {
-        return send(webSocketSession, Action.GET_MSG, Pair("message_id", messageId))
+        return send(_webSocketSession, Action.GET_MSG, Pair("message_id", messageId))
     }
 
     override suspend fun deleteMsg(messageId: Int): NoData {
-        return send(webSocketSession, Action.DELETE_MSG, Pair("message_id", messageId))
+        return send(_webSocketSession, Action.DELETE_MSG, Pair("message_id", messageId))
     }
 
     override suspend fun markMsgAsRead(messageId: Int): NoData {
-        return send(webSocketSession, Action.MARK_MSG_AS_READ, Pair("message_id", messageId))
+        return send(_webSocketSession, Action.MARK_MSG_AS_READ, Pair("message_id", messageId))
     }
 
     override suspend fun getForwardMsg(forwardMessageId: String): GetForwardMsg {
-        return send(webSocketSession, Action.GET_FORWARD_MSG, Pair("forward_message_id", forwardMessageId))
+        return send(_webSocketSession, Action.GET_FORWARD_MSG, Pair("forward_message_id", forwardMessageId))
     }
 
     override suspend fun getGroupMsgHistory(messageSeq: Long?, groupId: Long): GetGroupMsgHistory {
         return send(
-            webSocketSession, Action.GET_GROUP_MSG_HISTORY, Pair("message_seq", messageSeq), Pair("group_id", groupId)
+            _webSocketSession, Action.GET_GROUP_MSG_HISTORY, Pair("message_seq", messageSeq), Pair("group_id", groupId)
         )
     }
 
     override suspend fun getImage(file: String): GetImage {
-        return send(webSocketSession, Action.GET_IMAGE, Pair("file", file))
+        return send(_webSocketSession, Action.GET_IMAGE, Pair("file", file))
     }
 
     override suspend fun canSendImage(): CanDo {
-        return send(webSocketSession, Action.CAN_SEND_IMAGE)
+        return send(_webSocketSession, Action.CAN_SEND_IMAGE)
     }
 
     override suspend fun canSendRecord(): CanDo {
-        return send(webSocketSession, Action.CAN_SEND_RECORD)
+        return send(_webSocketSession, Action.CAN_SEND_RECORD)
     }
 
     override suspend fun setFriendAddRequest(
@@ -242,7 +231,7 @@ class QBot(
         remark: String,
     ): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_FRIEND_ADD_REQUEST,
             Pair("flag", flag),
             Pair("approve", approve),
@@ -260,7 +249,7 @@ class QBot(
         reason: String,
     ): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_ADD_REQUEST,
             Pair("flag", flag),
             Pair("sub_type", subType),
@@ -271,13 +260,13 @@ class QBot(
 
     override suspend fun getGroupInfo(groupId: Long, noCache: Boolean): GetGroupInfo {
         return send(
-            webSocketSession, Action.GET_GROUP_INFO, Pair("group_id", groupId), Pair("no_cache", noCache)
+            _webSocketSession, Action.GET_GROUP_INFO, Pair("group_id", groupId), Pair("no_cache", noCache)
         )
     }
 
     override suspend fun getGroupList(noCache: Boolean): GetGroupList {
         return send(
-            webSocketSession, Action.GET_GROUP_LIST, Pair("no_cache", noCache)
+            _webSocketSession, Action.GET_GROUP_LIST, Pair("no_cache", noCache)
         )
     }
 
@@ -287,7 +276,7 @@ class QBot(
         noCache: Boolean,
     ): GetGroupMemberInfo {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.GET_GROUP_MEMBER_INFO,
             Pair("group_id", groupId),
             Pair("user_id", userId),
@@ -297,33 +286,33 @@ class QBot(
 
     override suspend fun getGroupMemberList(groupId: Long, noCache: Boolean): GetGroupMemberList {
         return send(
-            webSocketSession, Action.GET_GROUP_MEMBER_LIST, Pair("group_id", groupId), Pair("no_cache", noCache)
+            _webSocketSession, Action.GET_GROUP_MEMBER_LIST, Pair("group_id", groupId), Pair("no_cache", noCache)
         )
     }
 
     override suspend fun getGroupHonorInfo(groupId: Long, type: String): GetGroupHonorInfo {
         return send(
-            webSocketSession, Action.GET_GROUP_HONOR_INFO, Pair("group_id", groupId), Pair("type", type)
+            _webSocketSession, Action.GET_GROUP_HONOR_INFO, Pair("group_id", groupId), Pair("type", type)
         )
     }
 
     override suspend fun getEssenceMsgList(groupId: Long): GetEssenceMsgList {
-        return send(webSocketSession, Action.GET_ESSENCE_MSG_LIST, Pair("group_id", groupId))
+        return send(_webSocketSession, Action.GET_ESSENCE_MSG_LIST, Pair("group_id", groupId))
     }
 
     override suspend fun getGroupAtAllRemain(groupId: Long): GetGroupAtAllRemain {
-        return send(webSocketSession, Action.GET_GROUP_AT_ALL_REMAIN, Pair("group_id", groupId))
+        return send(_webSocketSession, Action.GET_GROUP_AT_ALL_REMAIN, Pair("group_id", groupId))
     }
 
     override suspend fun setGroupName(groupId: Long, groupName: String): NoData {
         return send(
-            webSocketSession, Action.SET_GROUP_NAME, Pair("group_id", groupId), Pair("group_name", groupName)
+            _webSocketSession, Action.SET_GROUP_NAME, Pair("group_id", groupId), Pair("group_name", groupName)
         )
     }
 
     override suspend fun setGroupPortrait(groupId: Long, file: String, cache: Int): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_PORTRAIT,
             Pair("group_id", groupId),
             Pair("file", file),
@@ -333,7 +322,7 @@ class QBot(
 
     override suspend fun setGroupAdmin(groupId: Long, userId: Long, enable: Boolean): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_ADMIN,
             Pair("group_id", groupId),
             Pair("user_id", userId),
@@ -343,7 +332,7 @@ class QBot(
 
     override suspend fun setGroupCard(groupId: Long, userId: Long, card: String): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_CARD,
             Pair("group_id", groupId),
             Pair("user_id", userId),
@@ -358,7 +347,7 @@ class QBot(
         duration: Int,
     ): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_SPECIAL_TITLE,
             Pair("group_id", groupId),
             Pair("user_id", userId),
@@ -369,7 +358,7 @@ class QBot(
 
     override suspend fun setGroupBan(groupId: Long, userId: Long, duration: Int): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_BAN,
             Pair("group_id", groupId),
             Pair("user_id", userId),
@@ -379,7 +368,7 @@ class QBot(
 
     override suspend fun setGroupWholeBan(groupId: Long, enable: Boolean): NoData {
         return send(
-            webSocketSession, Action.SET_GROUP_WHOLE_BAN, Pair("group_id", groupId), Pair("enable", enable)
+            _webSocketSession, Action.SET_GROUP_WHOLE_BAN, Pair("group_id", groupId), Pair("enable", enable)
         )
     }
 
@@ -390,7 +379,7 @@ class QBot(
         duration: Int,
     ): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_ANONYMOUS_BAN,
             Pair("group_id", groupId),
             Pair("anonymous", anonymous),
@@ -400,16 +389,16 @@ class QBot(
     }
 
     override suspend fun setEssenceMsg(messageId: Long): NoData {
-        return send(webSocketSession, Action.SET_ESSENCE_MSG, Pair("message_id", messageId))
+        return send(_webSocketSession, Action.SET_ESSENCE_MSG, Pair("message_id", messageId))
     }
 
     override suspend fun sendGroupSign(groupId: Long): NoData {
-        return send(webSocketSession, Action.SEND_GROUP_SIGN, Pair("group_id", groupId))
+        return send(_webSocketSession, Action.SEND_GROUP_SIGN, Pair("group_id", groupId))
     }
 
     override suspend fun sendGroupNotice(groupId: Long, content: String, image: String?): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SEND_GROUP_NOTICE,
             Pair("group_id", groupId),
             Pair("content", content),
@@ -418,7 +407,7 @@ class QBot(
     }
 
     override suspend fun getGroupNotice(groupId: Long): GetGroupNotice {
-        return send(webSocketSession, Action.GET_GROUP_NOTICE, Pair("group_id", groupId))
+        return send(_webSocketSession, Action.GET_GROUP_NOTICE, Pair("group_id", groupId))
     }
 
     override suspend fun setGroupKick(
@@ -427,7 +416,7 @@ class QBot(
         rejectAddRequest: Boolean,
     ): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.SET_GROUP_KICK,
             Pair("group_id", groupId),
             Pair("user_id", userId),
@@ -437,7 +426,7 @@ class QBot(
 
     override suspend fun setGroupLeave(groupId: Long, isDismiss: Boolean): NoData {
         return send(
-            webSocketSession, Action.SET_GROUP_LEAVE, Pair("group_id", groupId), Pair("is_dismiss", isDismiss)
+            _webSocketSession, Action.SET_GROUP_LEAVE, Pair("group_id", groupId), Pair("is_dismiss", isDismiss)
         )
     }
 
@@ -448,7 +437,7 @@ class QBot(
         folder: String,
     ): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.UPLOAD_GROUP_FILE,
             Pair("group_id", groupId),
             Pair("file", file),
@@ -459,7 +448,7 @@ class QBot(
 
     override suspend fun deleteGroupFile(groupId: Long, fileId: String, busid: Int): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.DELETE_GROUP_FILE,
             Pair("group_id", groupId),
             Pair("file_id", fileId),
@@ -473,7 +462,7 @@ class QBot(
         parentId: String,
     ): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.CREATE_GROUP_FILE_FOLDER,
             Pair("group_id", groupId),
             Pair("name", name),
@@ -483,12 +472,12 @@ class QBot(
 
     override suspend fun deleteGroupFolder(groupId: Long, folderId: String): NoData {
         return send(
-            webSocketSession, Action.DELETE_GROUP_FOLDER, Pair("group_id", groupId), Pair("folder_id", folderId)
+            _webSocketSession, Action.DELETE_GROUP_FOLDER, Pair("group_id", groupId), Pair("folder_id", folderId)
         )
     }
 
     override suspend fun getGroupFileSystemInfo(groupId: Long): GetGroupFileSystemInfo {
-        return send(webSocketSession, Action.GET_GROUP_FILE_SYSTEM_INFO, Pair("group_id", groupId))
+        return send(_webSocketSession, Action.GET_GROUP_FILE_SYSTEM_INFO, Pair("group_id", groupId))
     }
 
     override suspend fun getGroupFilesByFolder(
@@ -496,7 +485,7 @@ class QBot(
         folderId: String,
     ): GetGroupFilesByFolder {
         return send(
-            webSocketSession, Action.GET_GROUP_FILES_BY_FOLDER, Pair("group_id", groupId), Pair("folder_id", folderId)
+            _webSocketSession, Action.GET_GROUP_FILES_BY_FOLDER, Pair("group_id", groupId), Pair("folder_id", folderId)
         )
     }
 
@@ -506,7 +495,7 @@ class QBot(
         busid: Int,
     ): GetGroupFileUrl {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.GET_GROUP_FILE_URL,
             Pair("group_id", groupId),
             Pair("file_id", fileId),
@@ -516,7 +505,7 @@ class QBot(
 
     override suspend fun uploadPrivateFile(userId: Long, file: String, name: String): NoData {
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.UPLOAD_PRIVATE_FILE,
             Pair("user_id", userId),
             Pair("file", file),
@@ -525,15 +514,15 @@ class QBot(
     }
 
     override suspend fun getVersionInfo(): GetVersionInfo {
-        return send(webSocketSession, Action.GET_VERSION_INFO)
+        return send(_webSocketSession, Action.GET_VERSION_INFO)
     }
 
     override suspend fun getStatus(): GetStatus {
-        return send(webSocketSession, Action.GET_STATUS)
+        return send(_webSocketSession, Action.GET_STATUS)
     }
 
     override suspend fun reloadEventFilter(file: String): NoData {
-        return send(webSocketSession, Action.RELOAD_EVENT_FILTER, Pair("file", file))
+        return send(_webSocketSession, Action.RELOAD_EVENT_FILTER, Pair("file", file))
     }
 
     override suspend fun downloadFile(
@@ -546,7 +535,7 @@ class QBot(
             headers[it].first + ": " + headers[it].second
         }
         return send(
-            webSocketSession,
+            _webSocketSession,
             Action.DOWNLOAD_FILE,
             Pair("url", url),
             Pair("thread_count", threadCount),
@@ -555,27 +544,32 @@ class QBot(
     }
 
     override suspend fun checkUrlSafely(url: String): CheckUrlSafely {
-        return send(webSocketSession, Action.CHECK_URL_SAFELY, Pair("url", url))
+        return send(_webSocketSession, Action.CHECK_URL_SAFELY, Pair("url", url))
     }
 
     override suspend fun handleQuickOperation(context: BasePostEvent, operation: Any): NoData {
         return send(
-            webSocketSession, Action.HANDLE_QUICK_OPERATION,
+            _webSocketSession, Action.HANDLE_QUICK_OPERATION,
             Pair("context", context),
             Pair("operation", operation),
         )
     }
 
     override suspend fun sendGuildChannelMsg(
-        guildId: Long,
-        channelId: Long,
-        message: MessageDetail
+        guildId: Long, channelId: Long, message: MessageDetail
     ): StringMessageIdRet {
         return send(
-            webSocketSession, Action.SEND_GUILD_CHANNEL_MSG,
+            _webSocketSession,
+            Action.SEND_GUILD_CHANNEL_MSG,
             Pair("guild_id", guildId),
             Pair("channel_id", channelId),
             Pair("message", message)
+        )
+    }
+
+    override suspend fun getGuildMsg(messageId: String, noCache: Boolean): GetGuildMsg {
+        return send(
+            _webSocketSession, Action.GET_GUILD_MSG, Pair("message_id", messageId), Pair("no_cache", noCache)
         )
     }
 }

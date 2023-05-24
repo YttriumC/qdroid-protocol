@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import java.util.concurrent.atomic.AtomicInteger
 
 @JsonSerialize(using = Action.Serializer::class)
-class Action<R, T : BaseApi<R>> private constructor(
+class Action<T : BaseApi<R>, R> private constructor(
     val action: String,
     val respType: Class<T>,
     val returnType: Class<R>
@@ -136,11 +136,6 @@ class Action<R, T : BaseApi<R>> private constructor(
         val SEND_GUILD_CHANNEL_MSG =
             Action("send_guild_channel_msg", StringMessageIdRet::class.java, StringMessageIdRet.MessageId::class.java)
         val GET_GUILD_MSG = Action("get_guild_msg", GetGuildMsg::class.java, GetGuildMsg.GuildMsg::class.java)
-    }
-
-    fun cast(baseApi: BaseApi<*>): T {
-        @Suppress("UNCHECKED_CAST")
-        return baseApi as T
     }
 
     override fun equals(other: Any?): Boolean {

@@ -64,12 +64,7 @@ interface SendApi {
                     PostMessageType.PRIVATE -> sendPrivateMsg(userId!!, groupId, message, autoEscape)
                     PostMessageType.GROUP -> sendGroupMsg(groupId!!, message, autoEscape)
                     PostMessageType.GUILD -> MessageIdRet(
-                        Status.FAILED,
-                        Retcode.FAILED,
-                        "频道消息不支持",
-                        null,
-                        null,
-                        MessageIdRet.MessageId(0)
+                        Status.FAILED, Retcode.FAILED, "频道消息不支持", null, null, MessageIdRet.MessageId(0)
                     )
                 }
             }
@@ -192,4 +187,6 @@ interface SendApi {
     suspend fun handleQuickOperation(context: BasePostEvent, operation: Any): NoData
 
     suspend fun sendGuildChannelMsg(guildId: Long, channelId: Long, message: MessageDetail): StringMessageIdRet
+
+    suspend fun getGuildMsg(messageId: String, noCache: Boolean = false): GetGuildMsg
 }

@@ -28,13 +28,13 @@ class BotManager(
                 }
                 put(metaEvent.selfId, qBot)
                 qBot.statistics.addReceivedMetaEvent()
-                qBot.setWebSocketSession(session)
+                qBot.webSocketSession = session
                 return
             }
             this[postEvent.selfId]?.handleEvent(postEvent)
         } else {
             get((map["echo"].toString()).split(':')[0].toLong())?.let {
-                it.setWebSocketSession(session)
+                it.webSocketSession = session
                 it.handleApi(map)
             } ?: let {
                 log.info("Non-mapped message: {}", map)
