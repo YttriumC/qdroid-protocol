@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetImage(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: ImageDetail
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: ImageDetail
 ) : BaseApi<GetImage.ImageDetail>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,11 +22,8 @@ class GetImage(
     }
 
     data class ImageDetail(
-        @JsonProperty("size")
-        val size: Int,
-        @JsonProperty("filename")
-        val filename: String,
-        @JsonProperty("url")
-        val url: String,
+        @JsonProperty("size") val size: Int,
+        @JsonProperty("filename") val filename: String,
+        @JsonProperty("url") val url: String,
     )
 }

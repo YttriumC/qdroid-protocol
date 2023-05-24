@@ -8,18 +8,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetForwardMsg(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("messages")
-    data: ForwardMsgs
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("messages") data: ForwardMsgs
 ) : BaseApi<GetForwardMsg.ForwardMsgs>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -29,24 +23,17 @@ class GetForwardMsg(
     }
 
     data class ForwardMsgs(
-        @JsonProperty("messages")
-        val messages: MutableList<ForwardMsgDetail>
+        @JsonProperty("messages") val messages: MutableList<ForwardMsgDetail>
     ) {
         data class ForwardMsgDetail(
-            @JsonProperty("content")
-            val content: MessageDetail,
-            @JsonProperty("group_id")
-            val groupId: Long,
-            @JsonProperty("sender")
-            val sender: Sender,
-            @JsonProperty("time")
-            val time: Int,
+            @JsonProperty("content") val content: MessageDetail,
+            @JsonProperty("group_id") val groupId: Long,
+            @JsonProperty("sender") val sender: Sender,
+            @JsonProperty("time") val time: Int,
         ) {
             data class Sender(
-                @JsonProperty("nickname")
-                val nickname: String,
-                @JsonProperty("user_id")
-                val userId: Long,
+                @JsonProperty("nickname") val nickname: String,
+                @JsonProperty("user_id") val userId: Long,
             )
         }
     }

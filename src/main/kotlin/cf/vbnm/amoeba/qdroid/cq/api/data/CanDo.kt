@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class CanDo(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: Yes
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: Yes
 ) : BaseApi<CanDo.Yes>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,7 +22,6 @@ class CanDo(
     }
 
     data class Yes(
-        @JsonProperty("yes")
-        val yes: Int,
+        @JsonProperty("yes") val yes: Int,
     )
 }

@@ -13,18 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 private val log = Slf4kt.getLogger(GetMsg::class.java)
 
 class GetMsg(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: MsgDetail
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: MsgDetail
 ) : BaseApi<GetMsg.MsgDetail>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -45,12 +39,7 @@ class GetMsg(
             }
 
             PostMessageType.GUILD -> MessageIdRet(
-                Status.FAILED,
-                Retcode.FAILED,
-                "频道消息不支持",
-                null,
-                null,
-                MessageIdRet.MessageId(0)
+                Status.FAILED, Retcode.FAILED, "频道消息不支持", null, null, MessageIdRet.MessageId(0)
             )
         }
     }
@@ -65,14 +54,11 @@ class GetMsg(
         @JsonProperty("sender") val sender: Sender,
         @JsonProperty("time") val time: Int,
         @JsonProperty("message") val message: MessageDetail,
-        @JsonProperty("raw_message")
-        val rawMessage: String?,
+        @JsonProperty("raw_message") val rawMessage: String?,
     ) {
         data class Sender(
-            @JsonProperty("nickname")
-            val nickname: String,
-            @JsonProperty("user_id")
-            val userId: Long,
+            @JsonProperty("nickname") val nickname: String,
+            @JsonProperty("user_id") val userId: Long,
         )
     }
 }

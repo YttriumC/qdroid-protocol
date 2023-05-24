@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetModelShow(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: Models
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: Models
 ) : BaseApi<GetModelShow.Models>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,14 +22,11 @@ class GetModelShow(
     }
 
     data class Models(
-        @JsonProperty("variants")
-        val variants: MutableList<Variants>,
+        @JsonProperty("variants") val variants: MutableList<Variants>,
     ) {
         data class Variants(
-            @JsonProperty("model_show")
-            val modelShow: String,
-            @JsonProperty("need_pay")
-            val needPay: Boolean,
+            @JsonProperty("model_show") val modelShow: String,
+            @JsonProperty("need_pay") val needPay: Boolean,
 
             )
     }

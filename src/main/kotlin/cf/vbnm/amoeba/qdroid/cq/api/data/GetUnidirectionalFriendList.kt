@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetUnidirectionalFriendList(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: UnidirectionalFriendInfo
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: UnidirectionalFriendInfo
 ) : BaseApi<GetUnidirectionalFriendList.UnidirectionalFriendInfo>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,11 +22,8 @@ class GetUnidirectionalFriendList(
     }
 
     data class UnidirectionalFriendInfo(
-        @JsonProperty("user_id")
-        val userId: Long,
-        @JsonProperty("nickname")
-        val nickname: String,
-        @JsonProperty("source")
-        val source: String,
+        @JsonProperty("user_id") val userId: Long,
+        @JsonProperty("nickname") val nickname: String,
+        @JsonProperty("source") val source: String,
     )
 }

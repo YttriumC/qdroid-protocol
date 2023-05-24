@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetLoginInfo(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: UserInfo
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: UserInfo
 ) : BaseApi<GetLoginInfo.UserInfo>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,9 +22,7 @@ class GetLoginInfo(
     }
 
     data class UserInfo(
-        @JsonProperty("user_id")
-        val userId: Long,
-        @JsonProperty("nickname")
-        val nickname: String,
+        @JsonProperty("user_id") val userId: Long,
+        @JsonProperty("nickname") val nickname: String,
     )
 }

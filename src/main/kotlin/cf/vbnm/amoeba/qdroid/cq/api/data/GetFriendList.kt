@@ -18,14 +18,16 @@ class GetFriendList(
     @JsonProperty("echo")
     echo: String? = null,
     @JsonProperty("data")
-    data: MutableList<FriendInfo>
-) : BaseApi<MutableList<GetFriendList.FriendInfo>>(status, retcode, msg, wording, echo, data) {
+    data: FriendInfoList
+) : BaseApi<GetFriendList.FriendInfoList>(status, retcode, msg, wording, echo, data) {
 
     companion object {
         fun parseApiRet(map: Map<String, Any?>, objectMapper: ObjectMapper): BaseApi<*> {
             return objectMapper.convertValue(map, GetFriendList::class.java)
         }
     }
+
+    class FriendInfoList : ArrayList<FriendInfo>()
 
     data class FriendInfo(
         @JsonProperty("user_id")

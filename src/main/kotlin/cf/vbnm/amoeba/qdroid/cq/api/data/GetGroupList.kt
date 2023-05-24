@@ -18,14 +18,16 @@ class GetGroupList(
     @JsonProperty("echo")
     echo: String? = null,
     @JsonProperty("data")
-    data: MutableList<GroupInfo>
-) : BaseApi<MutableList<GetGroupList.GroupInfo>>(status, retcode, msg, wording, echo, data) {
+    data: GroupInfoList
+) : BaseApi<GetGroupList.GroupInfoList>(status, retcode, msg, wording, echo, data) {
 
     companion object {
         fun parseApiRet(map: Map<String, Any?>, objectMapper: ObjectMapper): BaseApi<*> {
             return objectMapper.convertValue(map, GetGroupList::class.java)
         }
     }
+
+    class GroupInfoList : ArrayList<GroupInfo>()
 
     data class GroupInfo(
         @JsonProperty("group_id")

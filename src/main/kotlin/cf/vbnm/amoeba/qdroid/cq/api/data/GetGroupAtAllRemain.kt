@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetGroupAtAllRemain(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: GroupAtAllRemain
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: GroupAtAllRemain
 ) : BaseApi<GetGroupAtAllRemain.GroupAtAllRemain>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,11 +22,8 @@ class GetGroupAtAllRemain(
     }
 
     data class GroupAtAllRemain(
-        @JsonProperty("can_at_all")
-        val canAtAll: Boolean,
-        @JsonProperty("remain_at_all_count_for_group")
-        val remainAtAllCountForGroup: Short,
-        @JsonProperty("remain_at_all_count_for_uin")
-        val remainAtAllCountForUin: Short,
+        @JsonProperty("can_at_all") val canAtAll: Boolean,
+        @JsonProperty("remain_at_all_count_for_group") val remainAtAllCountForGroup: Short,
+        @JsonProperty("remain_at_all_count_for_uin") val remainAtAllCountForUin: Short,
     )
 }

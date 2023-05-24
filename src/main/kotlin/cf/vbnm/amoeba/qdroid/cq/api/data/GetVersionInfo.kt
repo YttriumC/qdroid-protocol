@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetVersionInfo(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: VersionDetail
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: VersionDetail
 ) : BaseApi<GetVersionInfo.VersionDetail>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,33 +22,19 @@ class GetVersionInfo(
     }
 
     data class VersionDetail(
-        @JsonProperty("app_name")
-        val appName: String,
-        @JsonProperty("app_version")
-        val appVersion: String,
-        @JsonProperty("app_full_name")
-        val appFullName: String,
-        @JsonProperty("protocol_version")
-        val protocolVersion: String,
-        @JsonProperty("coolq_edition")
-        val coolqEdition: String,
-        @JsonProperty("coolq_directory")
-        val coolqDirectory: String,
-        @JsonProperty("go-cqhttp")
-        val goCqhttp: Boolean,
-        @JsonProperty("plugin_version")
-        val pluginVersion: String,
-        @JsonProperty("plugin_build_number")
-        val pluginBuildNumber: Int,
-        @JsonProperty("plugin_build_configuration")
-        val pluginBuildConfiguration: String,
-        @JsonProperty("runtime_version")
-        val runtimeVersion: String,
-        @JsonProperty("runtime_os")
-        val runtimeOs: String,
-        @JsonProperty("version")
-        val version: String,
-        @JsonProperty("protocol")
-        val protocol: Int,
+        @JsonProperty("app_name") val appName: String,
+        @JsonProperty("app_version") val appVersion: String,
+        @JsonProperty("app_full_name") val appFullName: String,
+        @JsonProperty("protocol_version") val protocolVersion: String,
+        @JsonProperty("coolq_edition") val coolqEdition: String,
+        @JsonProperty("coolq_directory") val coolqDirectory: String,
+        @JsonProperty("go-cqhttp") val goCqhttp: Boolean,
+        @JsonProperty("plugin_version") val pluginVersion: String,
+        @JsonProperty("plugin_build_number") val pluginBuildNumber: Int,
+        @JsonProperty("plugin_build_configuration") val pluginBuildConfiguration: String,
+        @JsonProperty("runtime_version") val runtimeVersion: String,
+        @JsonProperty("runtime_os") val runtimeOs: String,
+        @JsonProperty("version") val version: String,
+        @JsonProperty("protocol") val protocol: Int,
     )
 }

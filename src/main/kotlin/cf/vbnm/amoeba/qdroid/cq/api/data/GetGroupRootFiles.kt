@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class GetGroupRootFiles(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: GroupFiles
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: GroupFiles
 ) : BaseApi<GetGroupRootFiles.GroupFiles>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,9 +22,7 @@ class GetGroupRootFiles(
     }
 
     data class GroupFiles(
-        @JsonProperty("files")
-        val files: MutableList<QFile>,
-        @JsonProperty("folders")
-        val folders: MutableList<QFolder>,
+        @JsonProperty("files") val files: MutableList<QFile>,
+        @JsonProperty("folders") val folders: MutableList<QFolder>,
     )
 }

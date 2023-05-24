@@ -4,8 +4,7 @@ import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.data.MessageIdRet
-import cf.vbnm.amoeba.qdroid.cq.api.enums.Retcode
-import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
+import cf.vbnm.amoeba.qdroid.cq.api.data.StringMessageIdRet
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageSubType
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostMessageType
 import cf.vbnm.amoeba.qdroid.cq.events.enums.PostType
@@ -53,15 +52,14 @@ abstract class Message(
                 bot.sendGroupMsg(groupMessage.groupId, message)
             }
 
-            PostMessageType.GUILD -> MessageIdRet(
-                Status.FAILED,
-                Retcode.FAILED,
-                "频道消息不支持",
-                null,
-                null,
-                MessageIdRet.MessageId(0)
-            )
+            PostMessageType.GUILD -> throw IllegalArgumentException("Guild message not support, please use replyGuild()")
         }
+    }
+
+    suspend fun replyGuild(bot: QBot, message: MessageDetail): StringMessageIdRet {
+        return doIfGuildMessage {
+            bot.sendGuildChannelMsg(it.guildId, it.channelId, message)
+        } ?: throw IllegalArgumentException("private or group message not support, please use reply()")
     }
 
     open fun toGroupMessage(): GroupMessage {

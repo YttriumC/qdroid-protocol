@@ -7,18 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class MessageIdRet(
-    @JsonProperty("status")
-    status: Status,
-    @JsonProperty("retcode")
-    retcode: Retcode,
-    @JsonProperty("msg")
-    msg: String? = null,
-    @JsonProperty("wording")
-    wording: String? = null,
-    @JsonProperty("echo")
-    echo: String? = null,
-    @JsonProperty("data")
-    data: MessageId
+    @JsonProperty("status") status: Status,
+    @JsonProperty("retcode") retcode: Retcode,
+    @JsonProperty("msg") msg: String? = null,
+    @JsonProperty("wording") wording: String? = null,
+    @JsonProperty("echo") echo: String? = null,
+    @JsonProperty("data") data: MessageId
 ) : BaseApi<MessageIdRet.MessageId>(status, retcode, msg, wording, echo, data) {
 
     companion object {
@@ -28,7 +22,6 @@ class MessageIdRet(
     }
 
     data class MessageId(
-        @JsonProperty("message_id")
-        val messageId: Int
+        @JsonProperty("message_id") val messageId: Int
     )
 }
