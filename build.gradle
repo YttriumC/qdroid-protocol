@@ -79,7 +79,7 @@ dependencies {
         exclude group: 'com.mchange'
     }
     implementation "com.google.guava:guava:$guavaVersion"
-    implementation "cf.vbnm.chatgpt:ChatGPT4Java:1.1.7-jre17-SNAPSHOT"
+    implementation "cf.vbnm.chatgpt:ChatGPT4Java:2.0.0-jre17-SNAPSHOT"
 }
 
 
@@ -95,6 +95,10 @@ build {
 }
 distributions {
 
+}
+
+application {
+    mainClassName 'cf.vbnm.amoeba.AmoebaKt'
 }
 
 kotlin {

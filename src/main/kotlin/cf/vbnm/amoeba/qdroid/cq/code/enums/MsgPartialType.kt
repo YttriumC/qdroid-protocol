@@ -39,6 +39,7 @@ class MsgPartialType<T : BaseMsgPartial<*>> private constructor(
         val MUSIC = MsgPartialType<Music>("music", "音乐分享/音乐自定义分享")
         val IMAGE = MsgPartialType<Image>("image", "图片")
         val REPLY = MsgPartialType<Reply>("reply", "回复")
+        val GUILD_REPLY = MsgPartialType<GuildReply>("guild_reply", "回复")
         val RED_BAG = MsgPartialType<RedBag>("redbag", "红包")
         val POKE = MsgPartialType<Poke>("poke", "戳一戳")
         val GIFT = MsgPartialType<Gift>("gift", "礼物")

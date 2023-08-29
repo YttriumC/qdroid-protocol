@@ -2,6 +2,7 @@ package cf.vbnm.amoeba.qdroid.cq
 
 import cf.vbnm.amoeba.qdroid.cq.code.BaseMsgPartial
 import cf.vbnm.amoeba.qdroid.cq.code.data.At
+import cf.vbnm.amoeba.qdroid.cq.code.data.GuildReply
 import cf.vbnm.amoeba.qdroid.cq.code.data.Reply
 import cf.vbnm.amoeba.qdroid.cq.code.data.Text
 import cf.vbnm.amoeba.qdroid.cq.code.enums.MsgPartialType
@@ -79,6 +80,12 @@ class MessageDetail(capacity: Int) : ArrayList<BaseMsgPartial<*>>(capacity) {
     fun getReply(): Reply? {
         return MsgPartialType.REPLY.toTypeOrNull(
             stream().filter { it.type == MsgPartialType.REPLY }.findFirst().getOrNull()
+        )
+    }
+
+    fun getGuildReply(): GuildReply? {
+        return MsgPartialType.GUILD_REPLY.toTypeOrNull(
+            stream().filter { it.type == MsgPartialType.GUILD_REPLY }.findFirst().getOrNull()
         )
     }
 

@@ -4,17 +4,21 @@ import cf.vbnm.amoeba.core.log.Slf4kt
 import cf.vbnm.amoeba.qdroid.bot.QBot
 import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.events.Message
+import cf.vbnm.amoeba.qdroid.cq.events.message.GuildMessage
 import cf.vbnm.chatgpt.client.ChatGPTClient
 import cf.vbnm.chatgpt.entity.chat.ChatCompletion
 import cf.vbnm.chatgpt.entity.chat.ChatMessage
 import cf.vbnm.chatgpt.listener.StreamListener
+import cf.vbnm.chatgpt.spi.GeneralSupport
+import cf.vbnm.chatgpt.spi.GeneralSupport.Args
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import java.util.function.Supplier
 
 private val log = Slf4kt.getLogger(ChatGPTPlugin::class.java)
 
@@ -63,12 +67,12 @@ class ChatGPTPlugin(
                         if (removePrefix(msg.message.getText()).trim().isEmpty() && msg.message.getReply() != null) {
                             msg.message.getReply()?.data?.id?.let { id -> reply.addReply(id) }
                         }
-                        msg.reply(bot, reply)
+                        msg.doIfGuildMessage { msg.replyGuild(bot, reply) } ?: msg.reply(bot, reply)
                     }
                 }
             }
         }
-        val replies = getReplies(bot, msg.messageId)
+        val replies = msg.doIfGuildMessage { getGuildReplies(bot, it) } ?: getReplies(bot, msg.messageId)
         replies.add(
             0,
             ChatMessage.ofSystem(
@@ -124,18 +128,61 @@ class ChatGPTPlugin(
         return msgList
     }
 
-    class GPTKeySupplier : Supplier<String> {
+    private suspend fun getGuildReplies(bot: QBot, startMsg: GuildMessage): ArrayList<ChatMessage> {
+        val maxWords = 2048
+        val me = bot.selfId
+        var msgDetail = bot.getGuildMsg(startMsg.guildMessageId)
+        val msgList = ArrayList<ChatMessage>()
+        var words = 0
+        var dive = 0
+        val maxDive = 16
+        while (dive++ < maxDive) {
+            val message = if (msgDetail.data.sender.userId == me) {
+                ChatMessage.ofAssistant(
+                    msgDetail.data.message.getText().trim().removeSuffix(contentSuffix.trim()).trim()
+                )
+            } else {
+                ChatMessage.ofUser(removePrefix(msgDetail.data.message.getText().trim()).trim())
+            }
+            val reply = msgDetail.data.message.getGuildReply()
+            if (message.content.isNotBlank()) {
+                if ((words + message.content.length) > maxWords && msgList.size > 0)
+                    break
+                else
+                    words += message.content.length
+                msgList.add(0, message)
+            }
+            if (reply == null) break
+            msgDetail = bot.getGuildMsg(reply.data.id)
+        }
+        return msgList
+    }
+
+    class GPTKeySupplier : GeneralSupport {
         companion object {
             lateinit var plugin: ChatGPTPlugin
         }
 
-        override fun get(): String {
-            try {
-                return plugin["key"]!!
-            } catch (e: Exception) {
-                throw IllegalArgumentException("The chatgpt key has not set yet.", e)
+        override fun completionPath(): String = "https://cyttrium.openai.azure.com/openai/deployments/yttrium/chat" +
+                "/completions?api-version=2023-03-15-preview"
+
+        override fun generateImagePath(): String = "https://cyttrium.openai.azure.com/openai/images" +
+                "/generations:submit?api-version=2023-06-01-preview"
+
+        //        plugin["key"]!!
+        override fun isGetAllArgsAtOnce(): Boolean = true
+
+        override fun getAllArgsAtOnce(): Args {
+            return object : Args() {
+                init {
+                    completionPath = completionPath()
+                    generateImagePath = generateImagePath()
+                    headers = HttpHeaders().apply {
+                        add("api-key", plugin["key"])
+                        contentType = MediaType.APPLICATION_JSON
+                    }
+                }
             }
         }
-
     }
 }

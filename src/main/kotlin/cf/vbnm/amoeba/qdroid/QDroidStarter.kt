@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import
 @ComponentScan(value = ["cf.vbnm.amoeba.qdroid.config", "cf.vbnm.amoeba.qdroid.controller", "cf.vbnm.amoeba.qdroid.bot"])
 @Import(WebSocketConfig::class)
 @Configuration
-@EnableChatGPTClient(host = "https://openai.api2d.net", keySupplier = ChatGPTPlugin.GPTKeySupplier::class)
+@EnableChatGPTClient(readTimeoutMillis = 20 * 1000, generalSupport = ChatGPTPlugin.GPTKeySupplier::class)
 open class QDroidStarter : Starter<QDroidStarter> {
     override fun initProperty(coreProperty: CoreProperty) {
 

@@ -25,6 +25,10 @@ abstract class AbstractPlugin {
         return propertyService["plugin.${getPluginName()}.${name.trim().removePrefix(".")}"]
     }
 
+    open fun getPropKey(name: String): String {
+        return "plugin.${getPluginName()}.${name.trim().removePrefix(".")}"
+    }
+
     fun deleteProperty(name: String) {
         propertyService.delete("plugin.${getPluginName()}.${name.trim().removePrefix(".")}")
     }

@@ -7,6 +7,8 @@ import cf.vbnm.amoeba.qdroid.cq.MessageDetail
 import cf.vbnm.amoeba.qdroid.cq.api.BaseApi
 import cf.vbnm.amoeba.qdroid.cq.api.data.*
 import cf.vbnm.amoeba.qdroid.cq.api.enums.Action
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Retcode
+import cf.vbnm.amoeba.qdroid.cq.api.enums.Status
 import cf.vbnm.amoeba.qdroid.cq.events.BasePostEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.CancellableContinuation
@@ -52,7 +54,7 @@ class QBot(
                     it.second.resumeWith(Result.success(baseApi))
                 } catch (e: Exception) {
                     statistics.addFailedApi()
-                    it.second.resumeWith(Result.failure(e))
+                    it.second.resumeWith(Result.failure(IllegalStateException("Api return: $map", e)))
                 }
 
             }
@@ -167,6 +169,20 @@ class QBot(
         message: MessageDetail,
         autoEscape: Boolean,
     ): MessageIdRet {
+        if (groupId != null) {
+            return try {
+                send(
+                    _webSocketSession,
+                    Action.SEND_PRIVATE_MSG,
+                    Pair("user_id", userId),
+                    Pair("group_id", groupId),
+                    Pair("message", message),
+                    Pair("auto_escape", autoEscape)
+                )
+            } catch (_: Exception) {
+                MessageIdRet(Status.OK, Retcode.SUCCESS, null, null, null, MessageIdRet.MessageId(0))
+            }
+        }
         return send(
             _webSocketSession,
             Action.SEND_PRIVATE_MSG,
