@@ -1,4 +1,6 @@
 # QDroid
+由于QQ对模拟协议的封堵[Mrs4s/go-cqhttp#2471](https://github.com/Mrs4s/go-cqhttp/issues/2471), 此项目对接的上游无法维护, 故此项目也只得停止维护. 新的QQ机器人项目可以使用[qdroid-qq-bot](https://github.com/Lu7fer/qdroid-qq-bot)开发
+
 
 ## 简介 (Simple Description)
 
